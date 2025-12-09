@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Capture - Loop Catcher</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .capture-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .capture-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .capture-header h1 {
+      font-size: 32px;
+      margin: 0 0 12px 0;
+    }
+
+    .capture-header p {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .capture-content {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      text-align: center;
+    }
+
+    .capture-content h2 {
+      font-size: 24px;
+      margin: 0 0 16px 0;
+      color: var(--accent);
+    }
+
+    .capture-content p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .back-btn {
+      padding: 12px 24px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="capture-container">
+    <div class="capture-header">
+      <h1>📝 Capture Page</h1>
+      <p id="ideaTitle">Working on your idea</p>
+    </div>
+
+    <div class="capture-content">
+      <h2>🚧 Coming Soon</h2>
+      <p>This is where you'll actively work on your idea.</p>
+      <p style="margin-top: 24px;">
+        <button class="back-btn" onclick="window.location.href='app.html'">← Back to App</button>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const ideaTitle = urlParams.get('title');
+    
+    if (ideaTitle) {
+      document.getElementById('ideaTitle').textContent = `Working on: ${decodeURIComponent(ideaTitle)}`;
+    }
+  </script>
+</body>
+</html>

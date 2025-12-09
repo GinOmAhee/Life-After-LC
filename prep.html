@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prep Your Idea - Loop Catcher</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .prep-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .prep-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .prep-header h1 {
+      font-size: 32px;
+      margin: 0 0 12px 0;
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .prep-header p {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .progress-bar::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .progress-step.active .step-circle {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+
+    .progress-step.completed .step-circle {
+      background: rgba(125, 211, 252, 0.2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .step-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .progress-step.active .step-label {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .step-content {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      display: none;
+    }
+
+    .step-content.active {
+      display: block;
+    }
+
+    .step-title {
+      font-size: 24px;
+      margin: 0 0 8px 0;
+      color: var(--text);
+    }
+
+    .step-subtitle {
+      color: var(--text-muted);
+      margin: 0 0 32px 0;
+      font-size: 14px;
+    }
+
+    .form-field {
+      margin-bottom: 24px;
+    }
+
+    .form-field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .form-field .prompt {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-field textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .step-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .skip-link {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .skip-link a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .skip-link a:hover {
+      color: var(--accent);
+    }
+
+    .output-preview {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 24px;
+      display: none;
+    }
+
+    .output-preview.visible {
+      display: block;
+    }
+
+    .output-preview h4 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    .output-preview p {
+      margin: 8px 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .output-preview strong {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="prep-container">
+    <div class="prep-header">
+      <h1>🚀 Prep Your Idea</h1>
+      <p id="ideaTitle">Getting ready to work on your idea</p>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-step active" data-step="1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Vision</div>
+      </div>
+      <div class="progress-step" data-step="2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Essentials</div>
+      </div>
+      <div class="progress-step" data-step="3">
+        <div class="step-circle">3</div>
+        <div class="step-label">First Test</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Vision -->
+    <div class="step-content active" data-step="1">
+      <h2 class="step-title">✨ Vision</h2>
+      <p class="step-subtitle">Clarify what you're building and why it matters</p>
+
+      <div class="form-field">
+        <label>Core Statement</label>
+        <span class="prompt">Write one sentence that captures your idea and why it matters.</span>
+        <textarea id="coreStatement" placeholder="A lightweight app that helps solo parents organize daily tasks with dignity and ease."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Who is it for?</label>
+        <span class="prompt">Describe your primary audience.</span>
+        <input type="text" id="audience" placeholder="Solo parents balancing work and caregiving" />
+      </div>
+
+      <div class="form-field">
+        <label>Why will they need it?</label>
+        <span class="prompt">Explain the problem or pain point your idea solves.</span>
+        <textarea id="need" placeholder="They struggle with scattered workflows and need a central place to organize."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>What outcome will it create?</label>
+        <span class="prompt">State the benefit or transformation users will experience.</span>
+        <textarea id="outcome" placeholder="They'll feel more in control of their day."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Why does it matter to you?</label>
+        <span class="prompt">Connect the idea to your personal motivation.</span>
+        <textarea id="motivation" placeholder="I want to empower others with clarity and dignity."></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" onclick="skipPrep()">Skip Prep</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Essentials -->
+    <div class="step-content" data-step="2">
+      <h2 class="step-title">🔧 Essentials</h2>
+      <p class="step-subtitle">Identify what you need to get started</p>
+
+      <div class="form-field">
+        <label>Core Resources</label>
+        <span class="prompt">List the minimum tools or materials you need to begin.</span>
+        <textarea id="resources" placeholder="Firebase Hosting + basic HTML"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Skills & Knowledge</label>
+        <span class="prompt">What skills or know-how are essential to move forward?</span>
+        <textarea id="skills" placeholder="Basic coding in JavaScript"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>People & Support</label>
+        <span class="prompt">Do you need collaborators, mentors, or a support network?</span>
+        <textarea id="people" placeholder="A friend to test the prototype"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Time & Space</label>
+        <span class="prompt">What dedicated time or environment will help you focus?</span>
+        <textarea id="timeSpace" placeholder="Two hours each weekend"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Constraints & Limits</label>
+        <span class="prompt">What boundaries do you need to respect (budget, tools, compliance)?</span>
+        <textarea id="constraints" placeholder="Budget of $50/month for hosting"></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: First Test →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: First Test -->
+    <div class="step-content" data-step="3">
+      <h2 class="step-title">🧪 First Test</h2>
+      <p class="step-subtitle">Plan your first experiment</p>
+
+      <div class="form-field">
+        <label>Minimum Version</label>
+        <span class="prompt">What's the simplest version of your idea you can create right now?</span>
+        <textarea id="minVersion" placeholder="A single-page prototype with 3 task slots"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Core Action</label>
+        <span class="prompt">What's the first action users can take with it?</span>
+        <textarea id="coreAction" placeholder="Add a task and mark it complete"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Feedback Loop</label>
+        <span class="prompt">How will you know if it works?</span>
+        <textarea id="feedback" placeholder="Ask 3 users if they felt less overwhelmed"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Timeframe (Due Date)</label>
+        <span class="prompt">How quickly can you build and test this version?</span>
+        <input type="date" id="dueDate" />
+      </div>
+
+      <div class="form-field">
+        <label>Next Step if Positive</label>
+        <span class="prompt">If the test shows promise, what's the next logical step?</span>
+        <textarea id="nextStep" placeholder="Add recurring tasks and calendar integration"></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="completePrep()">Complete Prep →</button>
+      </div>
+    </div>
+
+    <div class="skip-link">
+      <a href="#" onclick="skipPrep(); return false;">Skip prep and go straight to capture →</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQNThNeCaMD7Z8O8mhCGsYyXbg2X8bpms",
+      authDomain: "life-after-loop-catcher.firebaseapp.com",
+      projectId: "life-after-loop-catcher",
+      storageBucket: "life-after-loop-catcher.appspot.com",
+      messagingSenderId: "664318439902",
+      appId: "1:664318439902:web:93748f55f1cb547bbead4f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Get idea details from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const ideaId = urlParams.get('id');
+    const ideaTitle = urlParams.get('title');
+
+    if (ideaTitle) {
+      document.getElementById('ideaTitle').textContent = `Preparing: ${decodeURIComponent(ideaTitle)}`;
+    }
+
+    let currentStep = 1;
+
+    window.nextStep = function() {
+      if (currentStep < 3) {
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('completed');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+        
+        currentStep++;
+        
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    window.prevStep = function() {
+      if (currentStep > 1) {
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+        
+        currentStep--;
+        
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('completed');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    window.completePrep = async function() {
+      const prepData = {
+        vision: {
+          coreStatement: document.getElementById('coreStatement').value,
+          audience: document.getElementById('audience').value,
+          need: document.getElementById('need').value,
+          outcome: document.getElementById('outcome').value,
+          motivation: document.getElementById('motivation').value
+        },
+        essentials: {
+          resources: document.getElementById('resources').value,
+          skills: document.getElementById('skills').value,
+          people: document.getElementById('people').value,
+          timeSpace: document.getElementById('timeSpace').value,
+          constraints: document.getElementById('constraints').value
+        },
+        firstTest: {
+          minVersion: document.getElementById('minVersion').value,
+          coreAction: document.getElementById('coreAction').value,
+          feedback: document.getElementById('feedback').value,
+          dueDate: document.getElementById('dueDate').value,
+          nextStep: document.getElementById('nextStep').value
+        },
+        prepCompleted: true,
+        prepCompletedAt: serverTimestamp()
+      };
+
+      // Save to Firebase if we have an ideaId
+      if (ideaId && db) {
+        try {
+          await updateDoc(doc(db, 'items', ideaId), prepData);
+          console.log('✅ Prep data saved');
+        } catch (err) {
+          console.error('Error saving prep:', err);
+        }
+      }
+
+      // Redirect to capture page
+      window.location.href = `capture.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle)}`;
+    };
+
+    window.skipPrep = function() {
+      if (confirm('Skip prep and go straight to capture? You can always come back to this later.')) {
+        window.location.href = `capture.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle)}`;
+      }
+    };
+  </script>
+</body>
+</html>
