@@ -12,6 +12,24 @@
       padding: 40px 20px;
     }
 
+    .back-home {
+      margin-bottom: 20px;
+    }
+
+    .back-home a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .back-home a:hover {
+      color: var(--accent);
+    }
+
     .prep-header {
       text-align: center;
       margin-bottom: 40px;
@@ -200,54 +218,101 @@
       color: var(--accent);
     }
 
-    .skip-link {
-      text-align: center;
-      margin-top: 24px;
-    }
-
-    .skip-link a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-
-    .skip-link a:hover {
-      color: var(--accent);
-    }
-
-    .output-preview {
-      background: var(--bg);
+    /* Summary Page Styles */
+    .summary-container {
+      background: var(--bg-elevated);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
-      margin-top: 24px;
+      padding: 40px;
       display: none;
     }
 
-    .output-preview.visible {
+    .summary-container.active {
       display: block;
     }
 
-    .output-preview h4 {
+    .summary-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .summary-header h2 {
+      font-size: 28px;
       margin: 0 0 12px 0;
-      font-size: 14px;
       color: var(--accent);
     }
 
-    .output-preview p {
-      margin: 8px 0;
-      font-size: 13px;
-      color: var(--text-muted);
+    .summary-section {
+      margin-bottom: 32px;
+      padding: 24px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
     }
 
-    .output-preview strong {
+    .summary-section h3 {
+      font-size: 18px;
+      margin: 0 0 16px 0;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-item {
+      margin-bottom: 12px;
+    }
+
+    .summary-item strong {
+      display: block;
       color: var(--text);
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .summary-item p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .summary-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media print {
+      .back-home,
+      .progress-bar,
+      .summary-actions,
+      .btn {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+        color: black;
+      }
+
+      .summary-container,
+      .summary-section {
+        background: white;
+        border: 1px solid #ddd;
+      }
     }
   </style>
 </head>
 <body>
   <div class="prep-container">
+    <div class="back-home">
+      <a href="app.html">← Back to Home</a>
+    </div>
+
     <div class="prep-header">
       <h1>🚀 Prep Your Idea</h1>
       <p id="ideaTitle">Getting ready to work on your idea</p>
@@ -257,150 +322,229 @@
       </p>
     </div>
 
-    <form id="ideaPrepForm">
-      <div class="progress-bar">
-        <div class="progress-step active" data-step="1">
-          <div class="step-circle">1</div>
-          <div class="step-label">Vision</div>
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-step active" data-step="1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Vision</div>
+      </div>
+      <div class="progress-step" data-step="2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Essentials</div>
+      </div>
+      <div class="progress-step" data-step="3">
+        <div class="step-circle">3</div>
+        <div class="step-label">First Test</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Vision -->
+    <div class="step-content active" data-step="1">
+      <h2 class="step-title">✨ Vision</h2>
+      <p class="step-subtitle">Clarify what you're building and why it matters</p>
+
+      <div class="form-field">
+        <label>Core Statement</label>
+        <span class="prompt">Write one sentence that captures your idea and why it matters.</span>
+        <textarea id="coreStatement" placeholder="A lightweight app that helps solo parents organize daily tasks with dignity and ease."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Who is it for?</label>
+        <span class="prompt">Describe your primary audience.</span>
+        <input type="text" id="audience" placeholder="Solo parents balancing work and caregiving" />
+      </div>
+
+      <div class="form-field">
+        <label>Why will they need it?</label>
+        <span class="prompt">Explain the problem or pain point your idea solves.</span>
+        <textarea id="need" placeholder="They struggle with scattered workflows and need a central place to organize."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>What outcome will it create?</label>
+        <span class="prompt">State the benefit or transformation users will experience.</span>
+        <textarea id="outcome" placeholder="They'll feel more in control of their day."></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Why does it matter to you?</label>
+        <span class="prompt">Connect the idea to your personal motivation.</span>
+        <textarea id="motivation" placeholder="I want to empower others with clarity and dignity."></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" onclick="skipPrep()">Skip to Capture</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Essentials -->
+    <div class="step-content" data-step="2">
+      <h2 class="step-title">🔧 Essentials</h2>
+      <p class="step-subtitle">Identify what you need to get started</p>
+
+      <div class="form-field">
+        <label>Core Resources</label>
+        <span class="prompt">List the minimum tools or materials you need to begin.</span>
+        <textarea id="resources" placeholder="Firebase Hosting + basic HTML"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Skills & Knowledge</label>
+        <span class="prompt">What skills or know-how are essential to move forward?</span>
+        <textarea id="skills" placeholder="Basic coding in JavaScript"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>People & Support</label>
+        <span class="prompt">Do you need collaborators, mentors, or a support network?</span>
+        <textarea id="people" placeholder="A friend to test the prototype"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Time & Space</label>
+        <span class="prompt">What dedicated time or environment will help you focus?</span>
+        <textarea id="timeSpace" placeholder="Two hours each weekend"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Constraints & Limits</label>
+        <span class="prompt">What boundaries do you need to respect (budget, tools, compliance)?</span>
+        <textarea id="constraints" placeholder="Budget of $50/month for hosting"></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep()">Next: First Test →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: First Test -->
+    <div class="step-content" data-step="3">
+      <h2 class="step-title">🧪 First Test</h2>
+      <p class="step-subtitle">Plan your first experiment</p>
+
+      <div class="form-field">
+        <label>Minimum Version</label>
+        <span class="prompt">What's the simplest version of your idea you can create right now?</span>
+        <textarea id="minVersion" placeholder="A single-page prototype with 3 task slots"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Core Action</label>
+        <span class="prompt">What's the first action users can take with it?</span>
+        <textarea id="coreAction" placeholder="Add a task and mark it complete"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Feedback Loop</label>
+        <span class="prompt">How will you know if it works?</span>
+        <textarea id="feedback" placeholder="Ask 3 users if they felt less overwhelmed"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label>Timeframe (Due Date)</label>
+        <span class="prompt">How quickly can you build and test this version?</span>
+        <input type="date" id="dueDate" />
+      </div>
+
+      <div class="form-field">
+        <label>Next Step if Positive</label>
+        <span class="prompt">If the test shows promise, what's the next logical step?</span>
+        <textarea id="nextStep" placeholder="Add recurring tasks and calendar integration"></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <button class="btn btn-primary" onclick="completePrep()">Complete Prep →</button>
+      </div>
+    </div>
+
+    <!-- Summary Page -->
+    <div class="summary-container" id="summaryContainer">
+      <div class="summary-header">
+        <h2>✅ Prep Complete!</h2>
+        <p style="color: var(--text-muted);">Here's your idea blueprint</p>
+      </div>
+
+      <div class="summary-section">
+        <h3>✨ Vision</h3>
+        <div class="summary-item">
+          <strong>Core Statement</strong>
+          <p id="sum-coreStatement"></p>
         </div>
-        <div class="progress-step" data-step="2">
-          <div class="step-circle">2</div>
-          <div class="step-label">Essentials</div>
+        <div class="summary-item">
+          <strong>Who is it for?</strong>
+          <p id="sum-audience"></p>
         </div>
-        <div class="progress-step" data-step="3">
-          <div class="step-circle">3</div>
-          <div class="step-label">First Test</div>
+        <div class="summary-item">
+          <strong>Why will they need it?</strong>
+          <p id="sum-need"></p>
+        </div>
+        <div class="summary-item">
+          <strong>What outcome will it create?</strong>
+          <p id="sum-outcome"></p>
+        </div>
+        <div class="summary-item">
+          <strong>Why does it matter to you?</strong>
+          <p id="sum-motivation"></p>
         </div>
       </div>
 
-      <!-- Step 1: Vision -->
-      <div class="step-content active" data-step="1">
-        <h2 class="step-title">✨ Vision</h2>
-        <p class="step-subtitle">Clarify what you're building and why it matters</p>
-
-        <div class="form-field">
-          <label>Core Statement</label>
-          <span class="prompt">Write one sentence that captures your idea and why it matters.</span>
-          <textarea id="coreStatement" placeholder="A lightweight app that helps solo parents organize daily tasks with dignity and ease."></textarea>
+      <div class="summary-section">
+        <h3>🔧 Essentials</h3>
+        <div class="summary-item">
+          <strong>Core Resources</strong>
+          <p id="sum-resources"></p>
         </div>
-
-        <div class="form-field">
-          <label>Who is it for?</label>
-          <span class="prompt">Describe your primary audience.</span>
-          <input type="text" id="audience" placeholder="Solo parents balancing work and caregiving" />
+        <div class="summary-item">
+          <strong>Skills & Knowledge</strong>
+          <p id="sum-skills"></p>
         </div>
-
-        <div class="form-field">
-          <label>Why will they need it?</label>
-          <span class="prompt">Explain the problem or pain point your idea solves.</span>
-          <textarea id="need" placeholder="They struggle with scattered workflows and need a central place to organize."></textarea>
+        <div class="summary-item">
+          <strong>People & Support</strong>
+          <p id="sum-people"></p>
         </div>
-
-        <div class="form-field">
-          <label>What outcome will it create?</label>
-          <span class="prompt">State the benefit or transformation users will experience.</span>
-          <textarea id="outcome" placeholder="They'll feel more in control of their day."></textarea>
+        <div class="summary-item">
+          <strong>Time & Space</strong>
+          <p id="sum-timeSpace"></p>
         </div>
-
-        <div class="form-field">
-          <label>Why does it matter to you?</label>
-          <span class="prompt">Connect the idea to your personal motivation.</span>
-          <textarea id="motivation" placeholder="I want to empower others with clarity and dignity."></textarea>
-        </div>
-
-        <div class="step-actions">
-          <button class="btn btn-secondary" onclick="skipPrep()">Skip Prep</button>
-          <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
+        <div class="summary-item">
+          <strong>Constraints & Limits</strong>
+          <p id="sum-constraints"></p>
         </div>
       </div>
 
-      <!-- Step 2: Essentials -->
-      <div class="step-content" data-step="2">
-        <h2 class="step-title">🔧 Essentials</h2>
-        <p class="step-subtitle">Identify what you need to get started</p>
-
-        <div class="form-field">
-          <label>Core Resources</label>
-          <span class="prompt">List the minimum tools or materials you need to begin.</span>
-          <textarea id="resources" placeholder="Firebase Hosting + basic HTML"></textarea>
+      <div class="summary-section">
+        <h3>🧪 First Test</h3>
+        <div class="summary-item">
+          <strong>Minimum Version</strong>
+          <p id="sum-minVersion"></p>
         </div>
-
-        <div class="form-field">
-          <label>Skills & Knowledge</label>
-          <span class="prompt">What skills or know-how are essential to move forward?</span>
-          <textarea id="skills" placeholder="Basic coding in JavaScript"></textarea>
+        <div class="summary-item">
+          <strong>Core Action</strong>
+          <p id="sum-coreAction"></p>
         </div>
-
-        <div class="form-field">
-          <label>People & Support</label>
-          <span class="prompt">Do you need collaborators, mentors, or a support network?</span>
-          <textarea id="people" placeholder="A friend to test the prototype"></textarea>
+        <div class="summary-item">
+          <strong>Feedback Loop</strong>
+          <p id="sum-feedback"></p>
         </div>
-
-        <div class="form-field">
-          <label>Time & Space</label>
-          <span class="prompt">What dedicated time or environment will help you focus?</span>
-          <textarea id="timeSpace" placeholder="Two hours each weekend"></textarea>
+        <div class="summary-item">
+          <strong>Due Date</strong>
+          <p id="sum-dueDate"></p>
         </div>
-
-        <div class="form-field">
-          <label>Constraints & Limits</label>
-          <span class="prompt">What boundaries do you need to respect (budget, tools, compliance)?</span>
-          <textarea id="constraints" placeholder="Budget of $50/month for hosting"></textarea>
-        </div>
-
-        <div class="step-actions">
-          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-          <button class="btn btn-primary" onclick="nextStep()">Next: First Test →</button>
+        <div class="summary-item">
+          <strong>Next Step if Positive</strong>
+          <p id="sum-nextStep"></p>
         </div>
       </div>
 
-      <!-- Step 3: First Test -->
-      <div class="step-content" data-step="3">
-        <h2 class="step-title">🧪 First Test</h2>
-        <p class="step-subtitle">Plan your first experiment</p>
-
-        <div class="form-field">
-          <label>Minimum Version</label>
-          <span class="prompt">What's the simplest version of your idea you can create right now?</span>
-          <textarea id="minVersion" placeholder="A single-page prototype with 3 task slots"></textarea>
-        </div>
-
-        <div class="form-field">
-          <label>Core Action</label>
-          <span class="prompt">What's the first action users can take with it?</span>
-          <textarea id="coreAction" placeholder="Add a task and mark it complete"></textarea>
-        </div>
-
-        <div class="form-field">
-          <label>Feedback Loop</label>
-          <span class="prompt">How will you know if it works?</span>
-          <textarea id="feedback" placeholder="Ask 3 users if they felt less overwhelmed"></textarea>
-        </div>
-
-        <div class="form-field">
-          <label>Timeframe (Due Date)</label>
-          <span class="prompt">How quickly can you build and test this version?</span>
-          <input type="date" id="dueDate" />
-        </div>
-
-        <div class="form-field">
-          <label>Next Step if Positive</label>
-          <span class="prompt">If the test shows promise, what's the next logical step?</span>
-          <textarea id="nextStep" placeholder="Add recurring tasks and calendar integration"></textarea>
-        </div>
-
-        <div class="step-actions">
-          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-          <button class="btn btn-primary" onclick="completePrep()">Complete Prep →</button>
-        </div>
+      <div class="summary-actions">
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Summary</button>
+        <button class="btn btn-primary" onclick="goToCapture()">Continue to Capture →</button>
       </div>
-
-        <div class="skip-link">
-          <a href="#" onclick="skipPrep(); return false;">Skip prep and go straight to capture →</a>
-        </div>
-      </div>
-    </form>  
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -435,6 +579,7 @@
     }
 
     let currentStep = 1;
+    let prepData = {};
 
     window.nextStep = function() {
       if (currentStep < 3) {
@@ -466,7 +611,7 @@
     };
 
     window.completePrep = async function() {
-      const prepData = {
+      prepData = {
         vision: {
           coreStatement: document.getElementById('coreStatement').value,
           audience: document.getElementById('audience').value,
@@ -502,7 +647,40 @@
         }
       }
 
-      // Redirect to capture page
+      // Show summary
+      showSummary();
+    };
+
+    function showSummary() {
+      // Hide progress bar and steps
+      document.getElementById('progressBar').style.display = 'none';
+      document.querySelectorAll('.step-content').forEach(el => el.style.display = 'none');
+
+      // Populate summary
+      document.getElementById('sum-coreStatement').textContent = prepData.vision.coreStatement || 'Not provided';
+      document.getElementById('sum-audience').textContent = prepData.vision.audience || 'Not provided';
+      document.getElementById('sum-need').textContent = prepData.vision.need || 'Not provided';
+      document.getElementById('sum-outcome').textContent = prepData.vision.outcome || 'Not provided';
+      document.getElementById('sum-motivation').textContent = prepData.vision.motivation || 'Not provided';
+
+      document.getElementById('sum-resources').textContent = prepData.essentials.resources || 'Not provided';
+      document.getElementById('sum-skills').textContent = prepData.essentials.skills || 'Not provided';
+      document.getElementById('sum-people').textContent = prepData.essentials.people || 'Not provided';
+      document.getElementById('sum-timeSpace').textContent = prepData.essentials.timeSpace || 'Not provided';
+      document.getElementById('sum-constraints').textContent = prepData.essentials.constraints || 'Not provided';
+
+      document.getElementById('sum-minVersion').textContent = prepData.firstTest.minVersion || 'Not provided';
+      document.getElementById('sum-coreAction').textContent = prepData.firstTest.coreAction || 'Not provided';
+      document.getElementById('sum-feedback').textContent = prepData.firstTest.feedback || 'Not provided';
+      document.getElementById('sum-dueDate').textContent = prepData.firstTest.dueDate || 'Not set';
+      document.getElementById('sum-nextStep').textContent = prepData.firstTest.nextStep || 'Not provided';
+
+      // Show summary
+      document.getElementById('summaryContainer').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.goToCapture = function() {
       window.location.href = `capture.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle)}`;
     };
 
@@ -514,4 +692,3 @@
   </script>
 </body>
 </html>
-
