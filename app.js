@@ -198,9 +198,9 @@ function detectOutput(term) {
 }
 
 const priorityMap = {
-  "✨ Relevant to Current Task🧠 Be Clear": "HIGH",
-  "✨ Relevant to Current Task🌱 Store Potential Innovations": "HIGH",
-  "✨ Relevant to Current Task📚 To Refine/Expand Knowledge": "HIGH",
+  "✨ Relevant to Current Concerns🧠 Be Clear": "HIGH",
+  "✨ Relevant to Current Concerns🌱 Store Potential Innovations": "HIGH",
+  "✨ Relevant to Current Concerns📚 To Refine/Expand Knowledge": "HIGH",
   "🏗️ Too Important/Foundational to Ignore🧠 Be Clear": "HIGH",
   "🏗️ Too Important/Foundational to Ignore🌱 Store Potential Innovations": "MEDIUM",
   "🏗️ Too Important/Foundational to Ignore📚 To Refine/Expand Knowledge": "MEDIUM",
@@ -491,7 +491,7 @@ function addSingleRow() {
         <option value="🌱 Mindset/Identity">🌱 Mindset/Identity</option>
         <option value="👥 Social Connection">👥 Social Connection</option>
         <option value="⚖️ Legal/Policy">⚖️ Legal/Policy</option>
-        <option value="🌟 Vision/Purpose/Goal">🌟 Vision/Purpose/Goal</option>
+        <option value="🌟 Vision/Mission/Purpose/Goal">🌟 Vision/Purpose/Goal</option>
         <option value="🕒 Tiny Task">🕒 Tiny Task</option>
         <option value="🗂️ Long-Term Project">🗂️ Long-Term Project</option>
         <option value="🌪️ Random Thought">🌪️ Random Thought</option>
@@ -500,7 +500,7 @@ function addSingleRow() {
     <td>
       <select class="cue-select">
         <option value="">Select cue</option>
-        <option value="✨ Relevant to Current Task">✨ Relevant to Current Task</option>
+        <option value="✨ Relevant to Current Concerns">✨ Relevant to Current Concerns</option>
         <option value="🏗️ Too Important/Foundational to Ignore">🏗️ Too Important/Foundational</option>
         <option value="🌱 Interesting, But Not Urgent">🌱 Interesting, But Not Urgent</option>
         <option value="👽 Not Related/Can Save for Later">👽 Not Related/Can Save for Later</option>
@@ -721,5 +721,6 @@ function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
 }
+
 
 console.log('✅ App initialized');
