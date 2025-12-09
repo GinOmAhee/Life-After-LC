@@ -491,7 +491,7 @@ function addSingleRow() {
         <option value="🌱 Mindset/Identity">🌱 Mindset/Identity</option>
         <option value="👥 Social Connection">👥 Social Connection</option>
         <option value="⚖️ Legal/Policy">⚖️ Legal/Policy</option>
-        <option value="🌟 Vision/Purpose/Goal">🌟 Vision/Mission/Purpose/Goal</option>
+        <option value="🌟 Vision/Purpose/Goal">🌟 Vision/Purpose/Goal</option>
         <option value="🕒 Tiny Task">🕒 Tiny Task</option>
         <option value="🗂️ Long-Term Project">🗂️ Long-Term Project</option>
         <option value="🌪️ Random Thought">🌪️ Random Thought</option>
@@ -500,7 +500,7 @@ function addSingleRow() {
     <td>
       <select class="cue-select">
         <option value="">Select cue</option>
-        <option value="✨ Relevant to Current Task">✨ Relevant to Current Concerns</option>
+        <option value="✨ Relevant to Current Task">✨ Relevant to Current Task</option>
         <option value="🏗️ Too Important/Foundational to Ignore">🏗️ Too Important/Foundational</option>
         <option value="🌱 Interesting, But Not Urgent">🌱 Interesting, But Not Urgent</option>
         <option value="👽 Not Related/Can Save for Later">👽 Not Related/Can Save for Later</option>
@@ -722,7 +722,4 @@ function escapeHtml(str) {
   return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
 }
 
-
 console.log('✅ App initialized');
-
-
