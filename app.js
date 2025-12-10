@@ -491,7 +491,7 @@ function addSingleRow() {
         <option value="🌱 Mindset/Identity">🌱 Mindset/Identity</option>
         <option value="👥 Social Connection">👥 Social Connection</option>
         <option value="⚖️ Legal/Policy">⚖️ Legal/Policy</option>
-        <option value="🌟 Vision/Mission/Purpose/Goal">🌟 Vision/Mission/Purpose/Goal</option>
+        <option value="🌟 Vision/Purpose/Goal">🌟 Vision/Purpose/Goal</option>
         <option value="🕒 Tiny Task">🕒 Tiny Task</option>
         <option value="🗂️ Long-Term Project">🗂️ Long-Term Project</option>
         <option value="🌪️ Random Thought">🌪️ Random Thought</option>
@@ -500,7 +500,7 @@ function addSingleRow() {
     <td>
       <select class="cue-select">
         <option value="">Select cue</option>
-        <option value="✨ Relevant to Current Concerns">✨ Relevant to Current Concerns</option>
+        <option value="✨ Relevant to Current Task">✨ Relevant to Current Task</option>
         <option value="🏗️ Too Important/Foundational to Ignore">🏗️ Too Important/Foundational</option>
         <option value="🌱 Interesting, But Not Urgent">🌱 Interesting, But Not Urgent</option>
         <option value="👽 Not Related/Can Save for Later">👽 Not Related/Can Save for Later</option>
@@ -661,6 +661,17 @@ function renderView(view = currentView, items = []) {
     
     const dateText = formatDate(it.dateAdded || it.createdAt);
     
+    // Calculate progress percentage
+    let completedStages = 0;
+    const totalStages = 4; // prep, create, review, launch
+    
+    if (it.prepCompleted || it.prepSkipped) completedStages++;
+    if (it.createCompleted) completedStages++;
+    if (it.reviewCompleted) completedStages++;
+    if (it.launchCompleted) completedStages++;
+    
+    const progressPercentage = (completedStages / totalStages) * 100;
+    
     card.innerHTML = `
       <div class="meta">
         <h3>${escapeHtml(it.term)}</h3>
@@ -668,19 +679,61 @@ function renderView(view = currentView, items = []) {
         <p style="color:var(--text-muted);font-size:12px">
           ${dateText ? 'Added ' + dateText : ''}
         </p>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-label">
+            <span style="font-size: 11px; color: var(--text-muted);">Progress</span>
+            <span style="font-size: 11px; color: var(--accent); font-weight: 600;">${Math.round(progressPercentage)}%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: ${progressPercentage}%"></div>
+          </div>
+          <div class="progress-stages">
+            <span class="stage ${it.prepCompleted || it.prepSkipped ? 'completed' : ''}" title="Prep">📋</span>
+            <span class="stage ${it.createCompleted ? 'completed' : ''}" title="Create">🎨</span>
+            <span class="stage ${it.reviewCompleted ? 'completed' : ''}" title="Review">📂</span>
+            <span class="stage ${it.launchCompleted ? 'completed' : ''}" title="Launch">🚀</span>
+          </div>
+        </div>
       </div>
       <div class="actions">
-        <button class="small get-started" data-id="${it.id}" data-term="${escapeHtml(it.term)}">Get Started</button>
+        ${!it.launchCompleted ? `<button class="small get-started" data-id="${it.id}" data-term="${escapeHtml(it.term)}">Get Started</button>` : ''}
+        ${it.reviewCompleted && !it.launchCompleted ? `<button class="small launch-btn" data-id="${it.id}" data-term="${escapeHtml(it.term)}">Launch</button>` : ''}
+        ${it.launchCompleted ? `<span class="status-badge">✅ Launched</span>` : ''}
         <button class="small edit" data-id="${it.id}">Edit</button>
         <button class="small delete" data-id="${it.id}">Delete</button>
       </div>
     `;
     listEl.appendChild(card);
 
-    // Get Started button
-    card.querySelector('.get-started').onclick = () => {
-      window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
-    };
+    // Get Started button - Check if prep completed, show Resume or Get Started
+    const getStartedBtn = card.querySelector('.get-started');
+    
+    if (it.prepCompleted) {
+      getStartedBtn.textContent = 'Resume';
+      getStartedBtn.style.background = 'rgba(34, 197, 94, 0.2)';
+      getStartedBtn.style.color = '#22c55e';
+      getStartedBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+      
+      // Determine where to resume based on completion status
+      getStartedBtn.onclick = () => {
+        if (it.createCompleted) {
+          // If create is done, show options modal or go to review
+          alert('Create stage complete! Ready for review and launch.');
+        } else if (it.prepCompleted) {
+          // Resume at create page
+          window.location.href = `capture.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+        } else {
+          // Resume at prep page
+          window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+        }
+      };
+    } else {
+      getStartedBtn.onclick = () => {
+        window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+      };
+    }
 
     card.querySelector('.edit').onclick = () => openModal(it);
     card.querySelector('.delete').onclick = async () => {
