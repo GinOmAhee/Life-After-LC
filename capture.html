@@ -418,7 +418,7 @@
       }
     }
 
-    // Review Output Button - Mark create stage as complete
+    // Review Output Button - Mark create AND review stages as complete
     document.getElementById('reviewOutputBtn').addEventListener('click', async () => {
       if (!ideaId || !db) {
         alert('Error: No idea ID found');
@@ -428,17 +428,21 @@
       try {
         await updateDoc(doc(db, 'items', ideaId), {
           createCompleted: true,
-          createCompletedAt: serverTimestamp()
+          createCompletedAt: serverTimestamp(),
+          reviewCompleted: true,
+          reviewCompletedAt: serverTimestamp()
         });
 
-        alert('✅ Create stage marked as complete! You can now review your output.');
-        console.log('📂 Review Output clicked - Create stage completed');
+        alert('✅ Create and Review stages marked as complete! You can now launch your idea.');
+        console.log('📂 Review Output clicked - Create and Review stages completed');
         
-        // Optional: Open file explorer or specific location
-        // window.open('file:///path/to/output', '_blank');
+        // Redirect back to app to show launch button
+        if (confirm('Go back to home to launch your idea?')) {
+          window.location.href = 'app.html';
+        }
         
       } catch (err) {
-        console.error('Error marking create as complete:', err);
+        console.error('Error marking stages as complete:', err);
         alert('Error saving progress: ' + err.message);
       }
     });
