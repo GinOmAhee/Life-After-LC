@@ -3,88 +3,448 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Capture - Loop Catcher</title>
+  <title>Create - Loop Catcher</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .capture-container {
-      max-width: 900px;
+    .create-container {
+      max-width: 1000px;
       margin: 0 auto;
       padding: 40px 20px;
     }
 
-    .capture-header {
+    .back-home {
+      margin-bottom: 20px;
+    }
+
+    .back-home a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .back-home a:hover {
+      color: var(--accent);
+    }
+
+    .create-header {
       text-align: center;
       margin-bottom: 40px;
     }
 
-    .capture-header h1 {
+    .create-header h1 {
       font-size: 32px;
       margin: 0 0 12px 0;
     }
 
-    .capture-header p {
+    .create-header p {
       color: var(--text-muted);
       font-size: 16px;
     }
 
-    .capture-content {
+    .review-output-section {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 24px;
       background: var(--bg-elevated);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 40px;
-      text-align: center;
     }
 
-    .capture-content h2 {
-      font-size: 24px;
-      margin: 0 0 16px 0;
-      color: var(--accent);
-    }
-
-    .capture-content p {
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-
-    .back-btn {
-      padding: 12px 24px;
+    .review-output-btn {
+      padding: 16px 32px;
       background: var(--accent);
       color: var(--bg);
       border: none;
       border-radius: var(--radius);
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.2s;
     }
 
-    .back-btn:hover {
+    .review-output-btn:hover {
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+    }
+
+    .tools-section {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+
+    .tools-section h2 {
+      font-size: 24px;
+      margin: 0 0 8px 0;
+      color: var(--accent);
+    }
+
+    .tools-section .subtitle {
+      color: var(--text-muted);
+      margin: 0 0 24px 0;
+      font-size: 14px;
+    }
+
+    .tool-category {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tool-category:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .tool-category h3 {
+      font-size: 18px;
+      margin: 0 0 16px 0;
+      color: var(--text);
+    }
+
+    .tool-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .tool-item:hover {
+      background: rgba(125, 211, 252, 0.05);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .tool-emoji {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .tool-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tool-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .tool-url {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .no-suggestions {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
-  <div class="capture-container">
-    <div class="capture-header">
-      <h1>📝 Capture Page</h1>
-      <p id="ideaTitle">Working on your idea</p>
+  <div class="create-container">
+    <div class="back-home">
+      <a href="app.html">← Back to Home</a>
     </div>
 
-    <div class="capture-content">
-      <h2>🚧 Coming Soon</h2>
-      <p>This is where you'll actively work on your idea.</p>
-      <p style="margin-top: 24px;">
-        <button class="back-btn" onclick="window.location.href='app.html'">← Back to App</button>
+    <div class="create-header">
+      <h1>🎨 Create</h1>
+      <p id="ideaTitle">Work on your idea</p>
+    </div>
+
+    <div class="review-output-section">
+      <h3 style="margin: 0 0 16px 0; color: var(--text);">Ready to review your work?</h3>
+      <button class="review-output-btn" id="reviewOutputBtn">📂 Review Output</button>
+      <p style="margin: 16px 0 0 0; font-size: 12px; color: var(--text-muted);">
+        Click here when you've created your output and want to review it
       </p>
+    </div>
+
+    <div class="tools-section" id="toolsSection">
+      <h2>🛠️ Suggested Tools</h2>
+      <p class="subtitle">Based on your prep answers, here are some tools that might help:</p>
+      
+      <div id="toolsList"></div>
+      
+      <div class="no-suggestions hidden" id="noSuggestions">
+        <p>No specific tool suggestions available. Complete the prep stage to get personalized recommendations!</p>
+      </div>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQNThNeCaMD7Z8O8mhCGsYyXbg2X8bpms",
+      authDomain: "life-after-loop-catcher.firebaseapp.com",
+      projectId: "life-after-loop-catcher",
+      storageBucket: "life-after-loop-catcher.appspot.com",
+      messagingSenderId: "664318439902",
+      appId: "1:664318439902:web:93748f55f1cb547bbead4f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const urlParams = new URLSearchParams(window.location.search);
+    const ideaId = urlParams.get('id');
     const ideaTitle = urlParams.get('title');
     
     if (ideaTitle) {
-      document.getElementById('ideaTitle').textContent = `Working on: ${decodeURIComponent(ideaTitle)}`;
+      document.getElementById('ideaTitle').textContent = `Creating: ${decodeURIComponent(ideaTitle)}`;
     }
+
+    // Tool categories with detection keywords
+    const toolCategories = {
+      writing: {
+        keywords: ['write', 'draft', 'compose', 'outline', 'summarize', 'clarify', 'edit', 'document', 'note', 'list', 'jot', 'quick draft', 'practice writing'],
+        emoji: '✍️',
+        title: 'Text Editors & Documentation',
+        tools: [
+          { name: 'Google Docs', url: 'docs.google.com', emoji: '📄' },
+          { name: 'Microsoft Word Online', url: 'office.com/word', emoji: '📝' },
+          { name: 'Notion', url: 'notion.so', emoji: '📓' },
+          { name: 'Evernote', url: 'evernote.com', emoji: '🗒️' },
+          { name: 'Obsidian', url: 'obsidian.md', emoji: '💎' },
+          { name: 'Process Street', url: 'process.st', emoji: '📋' },
+          { name: 'SweetProcess', url: 'sweetprocess.com', emoji: '🍬' },
+          { name: 'Confluence', url: 'atlassian.com/software/confluence', emoji: '🌊' }
+        ]
+      },
+      design: {
+        keywords: ['design', 'illustrate', 'sketch', 'render', 'mockup', 'storyboard', 'doodle', 'quick sketch', 'sample image', 'prototype'],
+        emoji: '🎨',
+        title: 'Design & Visual Tools',
+        tools: [
+          { name: 'Canva', url: 'canva.com', emoji: '🎨' },
+          { name: 'Adobe Photoshop', url: 'adobe.com/photoshop', emoji: '🖼️' },
+          { name: 'Figma', url: 'figma.com', emoji: '🔷' },
+          { name: 'Miro', url: 'miro.com', emoji: '🗺️' },
+          { name: 'Whimsical', url: 'whimsical.com', emoji: '✨' }
+        ]
+      },
+      data: {
+        keywords: ['analyze', 'calculate', 'chart', 'graph', 'compare', 'measure', 'assess', 'check numbers', 'quick review', 'sample calc', 'test data'],
+        emoji: '📊',
+        title: 'Data & Analytics',
+        tools: [
+          { name: 'Microsoft Excel', url: 'office.com/excel', emoji: '📗' },
+          { name: 'Google Sheets', url: 'sheets.google.com', emoji: '📊' },
+          { name: 'Tableau', url: 'tableau.com', emoji: '📈' },
+          { name: 'Power BI', url: 'powerbi.microsoft.com', emoji: '📉' },
+          { name: 'Looker Studio', url: 'lookerstudio.google.com', emoji: '📋' }
+        ]
+      },
+      research: {
+        keywords: ['research', 'discover', 'explore', 'investigate', 'validate', 'gather', 'quick search', 'look up', 'skim', 'check one source'],
+        emoji: '🔍',
+        title: 'Research & Discovery',
+        tools: [
+          { name: 'Google Search', url: 'google.com', emoji: '🔍' },
+          { name: 'Bing with Copilot', url: 'bing.com', emoji: '🤖' },
+          { name: 'Google Scholar', url: 'scholar.google.com', emoji: '🎓' },
+          { name: 'Perplexity AI', url: 'perplexity.ai', emoji: '🧠' },
+          { name: 'Semantic Scholar', url: 'semanticscholar.org', emoji: '📚' }
+        ]
+      },
+      shopping: {
+        keywords: ['buy', 'shop', 'compare', 'review', 'recommend', 'suggest', 'evaluate', 'check one item', 'quick browse', 'sample product'],
+        emoji: '🛒',
+        title: 'Shopping & E-commerce',
+        tools: [
+          { name: 'Amazon', url: 'amazon.com', emoji: '📦' },
+          { name: 'Shopee', url: 'shopee.ph', emoji: '🛍️' },
+          { name: 'Lazada', url: 'lazada.com.ph', emoji: '🏪' },
+          { name: 'Google Shopping', url: 'shopping.google.com', emoji: '🔍' }
+        ]
+      },
+      location: {
+        keywords: ['locate', 'map', 'directions', 'explore', 'recommend', 'discover', 'check nearby', 'quick lookup', 'one location', 'sample route'],
+        emoji: '🗺️',
+        title: 'Maps & Travel',
+        tools: [
+          { name: 'Google Maps', url: 'maps.google.com', emoji: '🗺️' },
+          { name: 'Waze', url: 'waze.com', emoji: '🚗' },
+          { name: 'TripAdvisor', url: 'tripadvisor.com', emoji: '✈️' },
+          { name: 'Booking.com', url: 'booking.com', emoji: '🏨' }
+        ]
+      },
+      video: {
+        keywords: ['watch', 'learn', 'demonstrate', 'record', 'stream', 'tutorial', 'walkthrough', 'quick clip', 'sample video', 'test recording', 'short demo'],
+        emoji: '🎥',
+        title: 'Video & Streaming',
+        tools: [
+          { name: 'YouTube', url: 'youtube.com', emoji: '📺' },
+          { name: 'Loom', url: 'loom.com', emoji: '🎬' },
+          { name: 'Vimeo', url: 'vimeo.com', emoji: '🎞️' },
+          { name: 'OBS Studio', url: 'obsproject.com', emoji: '📹' }
+        ]
+      },
+      communication: {
+        keywords: ['share', 'notify', 'message', 'update', 'collaborate', 'connect', 'mentor', 'send one email', 'post once', 'quick reply', 'test message'],
+        emoji: '💬',
+        title: 'Communication & Collaboration',
+        tools: [
+          { name: 'Gmail', url: 'gmail.com', emoji: '📧' },
+          { name: 'Slack', url: 'slack.com', emoji: '💬' },
+          { name: 'Microsoft Teams', url: 'teams.microsoft.com', emoji: '👥' },
+          { name: 'Discord', url: 'discord.com', emoji: '🎮' }
+        ]
+      },
+      management: {
+        keywords: ['manage', 'schedule', 'invoice', 'track', 'organize', 'plan', 'optimize', 'check one invoice', 'log one expense', 'sample schedule'],
+        emoji: '📋',
+        title: 'Project & Business Management',
+        tools: [
+          { name: 'Trello', url: 'trello.com', emoji: '📋' },
+          { name: 'Asana', url: 'asana.com', emoji: '✅' },
+          { name: 'ClickUp', url: 'clickup.com', emoji: '🎯' },
+          { name: 'Monday.com', url: 'monday.com', emoji: '📅' },
+          { name: 'Notion', url: 'notion.so', emoji: '📓' }
+        ]
+      },
+      brainstorm: {
+        keywords: ['brainstorm', 'imagine', 'innovate', 'prototype', 'experiment', 'try', 'test', 'start', 'pilot', 'smallest version', 'quick attempt'],
+        emoji: '💡',
+        title: 'Brainstorming & Prototyping',
+        tools: [
+          { name: 'Miro', url: 'miro.com', emoji: '🗺️' },
+          { name: 'Whimsical', url: 'whimsical.com', emoji: '✨' },
+          { name: 'Figma', url: 'figma.com', emoji: '🔷' },
+          { name: 'Notion', url: 'notion.so', emoji: '📓' },
+          { name: 'Obsidian', url: 'obsidian.md', emoji: '💎' }
+        ]
+      }
+    };
+
+    // Detect which tools to suggest based on minimum version text
+    async function loadAndSuggestTools() {
+      if (!ideaId || !db) {
+        document.getElementById('noSuggestions').classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const ideaDoc = await getDoc(doc(db, 'items', ideaId));
+        
+        if (!ideaDoc.exists()) {
+          document.getElementById('noSuggestions').classList.remove('hidden');
+          return;
+        }
+
+        const ideaData = ideaDoc.data();
+        const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || '';
+
+        if (!minVersion) {
+          document.getElementById('noSuggestions').classList.remove('hidden');
+          return;
+        }
+
+        // Detect matching categories
+        const matchedCategories = [];
+        
+        for (const [key, category] of Object.entries(toolCategories)) {
+          const hasMatch = category.keywords.some(keyword => minVersion.includes(keyword.toLowerCase()));
+          if (hasMatch) {
+            matchedCategories.push(category);
+          }
+        }
+
+        if (matchedCategories.length === 0) {
+          document.getElementById('noSuggestions').classList.remove('hidden');
+          return;
+        }
+
+        // Render matched categories
+        const toolsList = document.getElementById('toolsList');
+        toolsList.innerHTML = '';
+
+        matchedCategories.forEach(category => {
+          const categoryDiv = document.createElement('div');
+          categoryDiv.className = 'tool-category';
+          
+          categoryDiv.innerHTML = `
+            <h3>${category.emoji} ${category.title}</h3>
+            <div class="tool-list">
+              ${category.tools.map(tool => `
+                <a href="https://${tool.url}" target="_blank" class="tool-item">
+                  <span class="tool-emoji">${tool.emoji}</span>
+                  <div class="tool-text">
+                    <span class="tool-name">${tool.name}</span>
+                    <span class="tool-url">${tool.url}</span>
+                  </div>
+                </a>
+              `).join('')}
+            </div>
+          `;
+          
+          toolsList.appendChild(categoryDiv);
+        });
+
+      } catch (err) {
+        console.error('Error loading idea data:', err);
+        document.getElementById('noSuggestions').classList.remove('hidden');
+      }
+    }
+
+    // Review Output Button - Mark create stage as complete
+    document.getElementById('reviewOutputBtn').addEventListener('click', async () => {
+      if (!ideaId || !db) {
+        alert('Error: No idea ID found');
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, 'items', ideaId), {
+          createCompleted: true,
+          createCompletedAt: serverTimestamp()
+        });
+
+        alert('✅ Create stage marked as complete! You can now review your output.');
+        console.log('📂 Review Output clicked - Create stage completed');
+        
+        // Optional: Open file explorer or specific location
+        // window.open('file:///path/to/output', '_blank');
+        
+      } catch (err) {
+        console.error('Error marking create as complete:', err);
+        alert('Error saving progress: ' + err.message);
+      }
+    });
+
+    // Load tools on page load
+    loadAndSuggestTools();
   </script>
 </body>
 </html>
