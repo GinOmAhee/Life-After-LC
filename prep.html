@@ -373,7 +373,7 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn btn-secondary" onclick="skipPrep()">Skip to Capture</button>
+        <button class="btn btn-secondary" onclick="skipPrep()">Skip to Create</button>
         <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
       </div>
     </div>
@@ -541,7 +541,7 @@
 
       <div class="summary-actions">
         <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Summary</button>
-        <button class="btn btn-primary" onclick="goToCapture()">Continue to Capture →</button>
+        <button class="btn btn-primary" onclick="goToCapture()">Continue to Create →</button>
       </div>
     </div>
   </div>
@@ -685,10 +685,11 @@
     };
 
     window.skipPrep = function() {
-      if (confirm('Skip prep and go straight to capture? You can always come back to this later.')) {
+      if (confirm('Skip prep and go straight to create? You can always come back to this later.')) {
         window.location.href = `capture.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle)}`;
       }
     };
   </script>
 </body>
 </html>
+
