@@ -67,7 +67,7 @@
                   <option value="🌱 Mindset/Identity">🌱 Mindset/Identity</option>
                   <option value="👥 Social Connection">👥 Social Connection</option>
                   <option value="⚖️ Legal/Policy">⚖️ Legal/Policy</option>
-                  <option value="🌟 Vision/Purpose/Goal">🌟 Vision/Purpose/Goal</option>
+                  <option value="🌟 Vision/Mission/Purpose/Goal">🌟 Vision/Mission/Purpose/Goal</option>
                   <option value="🕒 Tiny Task">🕒 Tiny Task</option>
                   <option value="🗂️ Long-Term Project">🗂️ Long-Term Project</option>
                   <option value="🌪️ Random Thought">🌪️ Random Thought</option>
@@ -76,7 +76,7 @@
               <td>
                 <select class="cue-select">
                   <option value="">Select cue</option>
-                  <option value="✨ Relevant to Current Task">✨ Relevant to Current Task</option>
+                  <option value="✨ Relevant to Current Concerns">✨ Relevant to Current Concerns</option>
                   <option value="🏗️ Too Important/Foundational to Ignore">🏗️ Too Important/Foundational</option>
                   <option value="🌱 Interesting, But Not Urgent">🌱 Interesting, But Not Urgent</option>
                   <option value="👽 Not Related/Can Save for Later">👽 Not Related/Can Save for Later</option>
@@ -124,24 +124,30 @@
       <h2 id="modalTitle">New Item</h2>
       <label>Term<input name="term" required /></label>
       <label>This Idea Becomes...
-        <select name="output" required>
-          <option value="">Choose output</option>
-          <option value="🧱 Physical/Tangible">🧱 Physical/Tangible</option>
-          <option value="🎪 Service/Experience">🎪 Service/Experience</option>
-          <option value="🎨 Media/Content">🎨 Media/Content</option>
-          <option value="🖥️ Digital Product/Tech">🖥️ Digital Product/Tech</option>
-          <option value="🧠 System/Method/Process">🧠 System/Method/Process</option>
-          <option value="🏢 Organization/Group">🏢 Organization/Group</option>
-          <option value="🎯 Skill/Capability">🎯 Skill/Capability</option>
-          <option value="🧩 Idea/Theory">🧩 Idea/Theory</option>
-          <option value="🌱 Mindset/Identity">🌱 Mindset/Identity</option>
-          <option value="👥 Social Connection">👥 Social Connection</option>
-          <option value="⚖️ Legal/Policy">⚖️ Legal/Policy</option>
-          <option value="🌟 Vision/Purpose/Goal">🌟 Vision/Purpose/Goal</option>
-          <option value="🕒 Tiny Task">🕒 Tiny Task</option>
-          <option value="🗂️ Long-Term Project">🗂️ Long-Term Project</option>
-          <option value="🌪️ Random Thought">🌪️ Random Thought</option>
-        </select>
+        <input 
+          type="text" 
+          name="output" 
+          list="outputOptions" 
+          placeholder="Type or select a category" 
+          required 
+        />
+        <datalist id="outputOptions">
+          <option value="🧱 Physical/Tangible">
+          <option value="🎪 Service/Experience">
+          <option value="🎨 Media/Content">
+          <option value="🖥️ Digital Product/Tech">
+          <option value="🧠 System/Method/Process">
+          <option value="🏢 Organization/Group">
+          <option value="🎯 Skill/Capability">
+          <option value="🧩 Idea/Theory">
+          <option value="🌱 Mindset/Identity">
+          <option value="👥 Social Connection">
+          <option value="⚖️ Legal/Policy">
+          <option value="🌟 Vision/Purpose/Goal">
+          <option value="🕒 Tiny Task">
+          <option value="🗂️ Long-Term Project">
+          <option value="🌪️ Random Thought">
+        </datalist>
       </label>
       <label>Cue
         <select name="cue" required>
