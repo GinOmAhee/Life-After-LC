@@ -316,10 +316,6 @@
     <div class="prep-header">
       <h1>🚀 Prep Your Idea</h1>
       <p id="ideaTitle">Getting ready to work on your idea</p>
-      <p class="disclaimer">
-        This page is for brainstorming ideas only. 
-        No personal, login, or financial information is collected.
-      </p>
     </div>
 
     <div class="progress-bar" id="progressBar">
@@ -373,7 +369,7 @@
       </div>
 
       <div class="step-actions">
-        <button class="btn btn-secondary" onclick="skipPrep()">Skip to Create</button>
+        <button class="btn btn-secondary" onclick="skipPrep()">Skip to Capture</button>
         <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
       </div>
     </div>
@@ -541,7 +537,7 @@
 
       <div class="summary-actions">
         <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Summary</button>
-        <button class="btn btn-primary" onclick="goToCapture()">Continue to Create →</button>
+        <button class="btn btn-primary" onclick="goToCapture()">Continue to Capture →</button>
       </div>
     </div>
   </div>
@@ -684,12 +680,24 @@
       window.location.href = `capture.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle)}`;
     };
 
-    window.skipPrep = function() {
+    window.skipPrep = async function() {
       if (confirm('Skip prep and go straight to create? You can always come back to this later.')) {
+        // Mark prep as skipped
+        if (ideaId && db) {
+          try {
+            await updateDoc(doc(db, 'items', ideaId), {
+              prepSkipped: true,
+              prepSkippedAt: serverTimestamp()
+            });
+            console.log('Prep skipped');
+          } catch (err) {
+            console.error('Error marking prep as skipped:', err);
+          }
+        }
+        
         window.location.href = `capture.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle)}`;
       }
     };
   </script>
 </body>
 </html>
-
