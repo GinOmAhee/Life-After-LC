@@ -710,29 +710,37 @@ function renderView(view = currentView, items = []) {
     // Get Started button - Check if prep completed, show Resume or Get Started
     const getStartedBtn = card.querySelector('.get-started');
     
-    if (it.prepCompleted) {
-      getStartedBtn.textContent = 'Resume';
-      getStartedBtn.style.background = 'rgba(34, 197, 94, 0.2)';
-      getStartedBtn.style.color = '#22c55e';
-      getStartedBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
-      
-      // Determine where to resume based on completion status
-      getStartedBtn.onclick = () => {
-        if (it.createCompleted) {
-          // If create is done, show options modal or go to review
-          alert('Create stage complete! Ready for review and launch.');
-        } else if (it.prepCompleted) {
-          // Resume at create page
-          window.location.href = `capture.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
-        } else {
-          // Resume at prep page
+    if (getStartedBtn) {
+      if (it.prepCompleted || it.prepSkipped) {
+        getStartedBtn.textContent = 'Resume';
+        getStartedBtn.style.background = 'rgba(34, 197, 94, 0.2)';
+        getStartedBtn.style.color = '#22c55e';
+        getStartedBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+        
+        // Determine where to resume based on completion status
+        getStartedBtn.onclick = () => {
+          if (it.createCompleted && it.reviewCompleted) {
+            alert('All stages complete! Ready to launch.');
+          } else if (it.createCompleted) {
+            alert('Create complete! Click "Review Output" in the create page to mark review as done.');
+            window.location.href = `capture.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+          } else if (it.prepCompleted || it.prepSkipped) {
+            window.location.href = `capture.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+          } else {
+            window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+          }
+        };
+      } else {
+        getStartedBtn.onclick = () => {
           window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
-        }
-      };
-    } else {
-      getStartedBtn.onclick = () => {
-        window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
-      };
+        };
+      }
+    }
+
+    // Launch button
+    const launchBtn = card.querySelector('.launch-btn');
+    if (launchBtn) {
+      launchBtn.onclick = () => openLaunchModal(it.id, it.term);
     }
 
     card.querySelector('.edit').onclick = () => openModal(it);
@@ -752,6 +760,84 @@ function renderView(view = currentView, items = []) {
       }
     };
   });
+}
+
+// Launch Modal Functions
+function openLaunchModal(ideaId, ideaTerm) {
+  const modal = document.createElement('div');
+  modal.className = 'launch-modal';
+  modal.innerHTML = `
+    <div class="launch-modal-content">
+      <h2>🚀 Launch "${escapeHtml(ideaTerm)}"</h2>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">Choose what happens next:</p>
+      
+      <div class="launch-options">
+        <button class="launch-option" data-action="archive">
+          <div class="option-icon">📦</div>
+          <div class="option-text">
+            <strong>Launched & Archive</strong>
+            <span>Mark as complete and archive this idea</span>
+          </div>
+        </button>
+        
+        <button class="launch-option" data-action="testing">
+          <div class="option-icon">🧪</div>
+          <div class="option-text">
+            <strong>Launched & Move to User Testing</strong>
+            <span>Continue with user feedback phase</span>
+          </div>
+        </button>
+      </div>
+      
+      <div style="text-align: center; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="this.closest('.launch-modal').remove()">Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Add event listeners to options
+  modal.querySelectorAll('.launch-option').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const action = btn.dataset.action;
+      await handleLaunch(ideaId, action);
+      modal.remove();
+    });
+  });
+}
+
+async function handleLaunch(ideaId, action) {
+  if (!db) {
+    alert('Firebase not configured');
+    return;
+  }
+
+  try {
+    const updateData = {
+      launchCompleted: true,
+      launchCompletedAt: serverTimestamp(),
+      launchAction: action
+    };
+
+    if (action === 'archive') {
+      updateData.status = '📦 Archived';
+      updateData.archived = true;
+    } else if (action === 'testing') {
+      updateData.status = '🧪 User Testing';
+      updateData.inTesting = true;
+    }
+
+    await updateDoc(doc(db, 'items', ideaId), updateData);
+    
+    const actionText = action === 'archive' ? 'archived' : 'moved to user testing';
+    alert(`✅ Successfully launched and ${actionText}!`);
+    
+    console.log(`🚀 Launched: ${ideaId} - Action: ${action}`);
+  } catch (err) {
+    console.error('Launch error:', err);
+    alert('Error launching: ' + err.message);
+  }
 }
 
 function openModal(item = null) {
