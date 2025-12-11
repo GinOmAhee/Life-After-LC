@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Settings - Loop Catcher</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .settings-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .back-home {
+      margin-bottom: 20px;
+    }
+
+    .back-home a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .back-home a:hover {
+      color: var(--accent);
+    }
+
+    .settings-header {
+      margin-bottom: 40px;
+    }
+
+    .settings-header h1 {
+      font-size: 32px;
+      margin: 0 0 8px 0;
+    }
+
+    .settings-header p {
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .settings-section {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .settings-section h2 {
+      font-size: 20px;
+      margin: 0 0 20px 0;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .setting-item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .setting-label {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .setting-description {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-switch.active {
+      background: var(--accent);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: var(--bg);
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(24px);
+    }
+
+    .setting-input {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .setting-select {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .custom-list {
+      margin-top: 12px;
+    }
+
+    .custom-list-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .custom-list-item input {
+      flex: 1;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-small:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-add {
+      margin-top: 8px;
+    }
+
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .btn-remove:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+    }
+
+    .btn-primary {
+      padding: 12px 24px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+    }
+
+    .btn-danger {
+      padding: 12px 24px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .prep-questions-list {
+      margin-top: 12px;
+    }
+
+    .prep-question-item {
+      background: var(--bg);
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 8px;
+    }
+
+    .prep-question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .prep-question-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .prep-question-prompt {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .reminder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .reminder-item {
+      background: var(--bg);
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .reminder-item-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .save-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .save-notification.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <div class="back-home">
+      <a href="app.html">← Back to Home</a>
+    </div>
+
+    <div class="settings-header">
+      <h1>⚙️ Settings</h1>
+      <p>Customize your Loop Catcher experience</p>
+    </div>
+
+    <!-- Prep Questions -->
+    <div class="settings-section">
+      <h2>📋 Prep Stage Questions</h2>
+      <div class="setting-item">
+        <div class="setting-label">Custom Prep Questions</div>
+        <div class="setting-description">Add, edit, or remove questions asked during the prep stage</div>
+        
+        <div class="prep-questions-list" id="prepQuestionsList"></div>
+        
+        <button class="btn-small btn-add" id="addPrepQuestion">+ Add Custom Question</button>
+      </div>
+    </div>
+
+    <!-- Default Storage -->
+    <div class="settings-section">
+      <h2>📂 Default File Storage</h2>
+      <div class="setting-item">
+        <div class="setting-label">Preferred Storage Location</div>
+        <div class="setting-description">Set your default storage for quick access during review</div>
+        
+        <select class="setting-select" id="defaultStorage">
+          <option value="">No default (always ask)</option>
+          <option value="local">Local (Computer)</option>
+          <option value="gdrive">Google Drive</option>
+          <option value="onedrive">Microsoft OneDrive</option>
+          <option value="dropbox">Dropbox</option>
+          <option value="box">Box</option>
+          <option value="amazon">Amazon Drive</option>
+          <option value="mega">Mega</option>
+          <option value="pcloud">pCloud</option>
+          <option value="sync">Sync.com</option>
+          <option value="tresorit">Tresorit</option>
+          <option value="icedrive">Icedrive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Preferred Tools -->
+    <div class="settings-section">
+      <h2>🛠️ Preferred Creation Tools</h2>
+      <div class="setting-item">
+        <div class="setting-label">My Tools</div>
+        <div class="setting-description">Add your preferred tools that will always show in the Create page</div>
+        
+        <div class="custom-list" id="preferredToolsList"></div>
+        
+        <button class="btn-small btn-add" id="addPreferredTool">+ Add Tool</button>
+      </div>
+    </div>
+
+    <!-- Theme & Appearance -->
+    <div class="settings-section">
+      <h2>🎨 Theme & Appearance</h2>
+      
+      <div class="setting-item">
+        <div class="setting-header">
+          <div>
+            <div class="setting-label">Dark Mode</div>
+            <div class="setting-description">Toggle between light and dark theme</div>
+          </div>
+          <div class="toggle-switch active" id="darkModeToggle"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Font Size</div>
+        <div class="setting-description">Adjust text size for better readability</div>
+        <select class="setting-select" id="fontSize">
+          <option value="small">Small</option>
+          <option value="medium" selected>Medium (Default)</option>
+          <option value="large">Large</option>
+        </select>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Layout Density</div>
+        <div class="setting-description">Choose between compact or spacious layout</div>
+        <select class="setting-select" id="layoutDensity">
+          <option value="compact">Compact</option>
+          <option value="normal" selected>Normal (Default)</option>
+          <option value="spacious">Spacious</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Reminders -->
+    <div class="settings-section">
+      <h2>🔔 Reminder & Cue Customization</h2>
+      
+      <div class="setting-item">
+        <div class="setting-label">Reminder Frequency by Category</div>
+        <div class="setting-description">Set how often you want reminders for each priority level</div>
+        
+        <div class="reminder-grid">
+          <div class="reminder-item">
+            <div class="reminder-item-label">🚀 Act Now</div>
+            <select class="setting-select" data-category="act-now">
+              <option value="none">No reminders</option>
+              <option value="daily" selected>Daily</option>
+              <option value="twice-daily">Twice daily</option>
+              <option value="every-3-hours">Every 3 hours</option>
+            </select>
+          </div>
+          
+          <div class="reminder-item">
+            <div class="reminder-item-label">🌿 Build Momentum</div>
+            <select class="setting-select" data-category="build-momentum">
+              <option value="none">No reminders</option>
+              <option value="daily">Daily</option>
+              <option value="every-2-days" selected>Every 2 days</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+          
+          <div class="reminder-item">
+            <div class="reminder-item-label">⏳ Later, But Worth It</div>
+            <select class="setting-select" data-category="later">
+              <option value="none">No reminders</option>
+              <option value="weekly" selected>Weekly</option>
+              <option value="biweekly">Bi-weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          
+          <div class="reminder-item">
+            <div class="reminder-item-label">📦 Parked Potential</div>
+            <select class="setting-select" data-category="parked">
+              <option value="none" selected>No reminders</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Do Not Disturb Hours</div>
+        <div class="setting-description">Set quiet hours when reminders won't be sent</div>
+        
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 12px;">
+          <div style="flex: 1;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Start Time</label>
+            <input type="time" class="setting-input" id="dndStart" value="22:00" />
+          </div>
+          <div style="flex: 1;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">End Time</label>
+            <input type="time" class="setting-input" id="dndEnd" value="08:00" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Localization -->
+    <div class="settings-section">
+      <h2>🌍 Localization</h2>
+      
+      <div class="setting-item">
+        <div class="setting-label">Time Zone</div>
+        <div class="setting-description">Set your time zone for accurate reminders</div>
+        <select class="setting-select" id="timezone">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="Pacific/Midway">(GMT-11:00) Midway Island</option>
+          <option value="Pacific/Honolulu">(GMT-10:00) Hawaii</option>
+          <option value="America/Anchorage">(GMT-09:00) Alaska</option>
+          <option value="America/Los_Angeles">(GMT-08:00) Pacific Time</option>
+          <option value="America/Denver">(GMT-07:00) Mountain Time</option>
+          <option value="America/Chicago">(GMT-06:00) Central Time</option>
+          <option value="America/New_York">(GMT-05:00) Eastern Time</option>
+          <option value="Europe/London">(GMT+00:00) London</option>
+          <option value="Europe/Paris">(GMT+01:00) Paris</option>
+          <option value="Europe/Athens">(GMT+02:00) Athens</option>
+          <option value="Asia/Dubai">(GMT+04:00) Dubai</option>
+          <option value="Asia/Manila">(GMT+08:00) Manila</option>
+          <option value="Asia/Tokyo">(GMT+09:00) Tokyo</option>
+          <option value="Australia/Sydney">(GMT+10:00) Sydney</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Data & Privacy -->
+    <div class="settings-section">
+      <h2>🔒 Data & Privacy Controls</h2>
+      
+      <div class="setting-item">
+        <div class="setting-label">Export Your Data</div>
+        <div class="setting-description">Download all your ideas and settings</div>
+        <div class="action-buttons">
+          <button class="btn-small" id="exportCSV">Export as CSV</button>
+          <button class="btn-small" id="exportJSON">Export as JSON</button>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Delete All Data</div>
+        <div class="setting-description">Permanently remove all your ideas and settings</div>
+        <button class="btn-danger" id="deleteAllData">Delete All Data</button>
+      </div>
+    </div>
+
+    <!-- Save Button -->
+    <div style="text-align: center; margin-top: 40px;">
+      <button class="btn-primary" id="saveSettings">💾 Save All Settings</button>
+    </div>
+  </div>
+
+  <!-- Save Notification -->
+  <div class="save-notification" id="saveNotification">
+    ✅ Settings saved successfully!
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      collection,
+      getDocs,
+      deleteDoc
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQNThNeCaMD7Z8O8mhCGsYyXbg2X8bpms",
+      authDomain: "life-after-loop-catcher.firebaseapp.com",
+      projectId: "life-after-loop-catcher",
+      storageBucket: "life-after-loop-catcher.appspot.com",
+      messagingSenderId: "664318439902",
+      appId: "1:664318439902:web:93748f55f1cb547bbead4f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Default prep questions
+    const defaultPrepQuestions = [
+      { id: 1, title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
+      { id: 2, title: "Who is it for?", prompt: "Describe your primary audience." },
+      { id: 3, title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
+      { id: 4, title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
+      { id: 5, title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." }
+    ];
+
+    let prepQuestions = [...defaultPrepQuestions];
+    let preferredTools = [];
+
+    // Load settings
+    async function loadSettings() {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const settingsDoc = await getDoc(doc(db, 'userSettings', user.uid));
+        if (settingsDoc.exists()) {
+          const settings = settingsDoc.data();
+          
+          // Load prep questions
+          if (settings.prepQuestions) {
+            prepQuestions = settings.prepQuestions;
+          }
+          
+          // Load preferred tools
+          if (settings.preferredTools) {
+            preferredTools = settings.preferredTools;
+          }
+          
+          // Load other settings
+          if (settings.defaultStorage) {
+            document.getElementById('defaultStorage').value = settings.defaultStorage;
+          }
+          
+          if (settings.fontSize) {
+            document.getElementById('fontSize').value = settings.fontSize;
+          }
+          
+          if (settings.layoutDensity) {
+            document.getElementById('layoutDensity').value = settings.layoutDensity;
+          }
+          
+          if (settings.timezone) {
+            document.getElementById('timezone').value = settings.timezone;
+          }
+          
+          if (settings.dndStart) {
+            document.getElementById('dndStart').value = settings.dndStart;
+          }
+          
+          if (settings.dndEnd) {
+            document.getElementById('dndEnd').value = settings.dndEnd;
+          }
+          
+          if (settings.darkMode !== undefined) {
+            document.getElementById('darkModeToggle').classList.toggle('active', settings.darkMode);
+          }
+        }
+        
+        renderPrepQuestions();
+        renderPreferredTools();
+        
+      } catch (err) {
+        console.error('Error loading settings:', err);
+      }
+    }
+
+    // Render prep questions
+    function renderPrepQuestions() {
+      const list = document.getElementById('prepQuestionsList');
+      list.innerHTML = '';
+      
+      prepQuestions.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'prep-question-item';
+        item.innerHTML = `
+          <div class="prep-question-header">
+            <input type="text" class="setting-input" value="${q.title}" data-index="${index}" data-field="title" style="flex: 1; margin-right: 8px;" />
+            <button class="btn-small btn-remove" onclick="removePrepQuestion(${index})">Remove</button>
+          </div>
+          <input type="text" class="setting-input" value="${q.prompt}" data-index="${index}" data-field="prompt" placeholder="Question prompt..." />
+        `;
+        list.appendChild(item);
+      });
+      
+      // Add event listeners
+      list.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          prepQuestions[index][field] = e.target.value;
+        });
+      });
+    }
+
+    window.removePrepQuestion = function(index) {
+      prepQuestions.splice(index, 1);
+      renderPrepQuestions();
+    };
+
+    document.getElementById('addPrepQuestion').addEventListener('click', () => {
+      prepQuestions.push({
+        id: Date.now(),
+        title: 'New Question',
+        prompt: 'Enter your prompt here...'
+      });
+      renderPrepQuestions();
+    });
+
+    // Render preferred tools
+    function renderPreferredTools() {
+      const list = document.getElementById('preferredToolsList');
+      list.innerHTML = '';
+      
+      preferredTools.forEach((tool, index) => {
+        const item = document.createElement('div');
+        item.className = 'custom-list-item';
+        item.innerHTML = `
+          <input type="text" class="setting-input" value="${tool.name}" data-index="${index}" data-field="name" placeholder="Tool name" />
+          <input type="text" class="setting-input" value="${tool.url}" data-index="${index}" data-field="url" placeholder="https://..." />
+          <button class="btn-small btn-remove" onclick="removePreferredTool(${index})">Remove</button>
+        `;
+        list.appendChild(item);
+      });
+      
+      // Add event listeners
+      list.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          preferredTools[index][field] = e.target.value;
+        });
+      });
+    }
+
+    window.removePreferredTool = function(index) {
+      preferredTools.splice(index, 1);
+      renderPreferredTools();
+    };
+
+    document.getElementById('addPreferredTool').addEventListener('click', () => {
+      preferredTools.push({ name: '', url: '' });
+      renderPreferredTools();
+    });
+
+    // Dark mode toggle
+    document.getElementById('darkModeToggle').addEventListener('click', (e) => {
+      e.target.classList.toggle('active');
+    });
+
+    // Save settings
+    document.getElementById('saveSettings').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please log in to save settings');
+        return;
+      }
+
+      const settings = {
+        prepQuestions,
+        preferredTools,
+        defaultStorage: document.getElementById('defaultStorage').value,
+        fontSize: document.getElementById('fontSize').value,
+        layoutDensity: document.getElementById('layoutDensity').value,
+        timezone: document.getElementById('timezone').value,
+        dndStart: document.getElementById('dndStart').value,
+        dndEnd: document.getElementById('dndEnd').value,
+        darkMode: document.getElementById('darkModeToggle').classList.contains('active'),
+        reminders: {
+          actNow: document.querySelector('[data-category="act-now"]').value,
+          buildMomentum: document.querySelector('[data-category="build-momentum"]').value,
+          later: document.querySelector('[data-category="later"]').value,
+          parked: document.querySelector('[data-category="parked"]').value
+        }
+      };
+
+      try {
+        await setDoc(doc(db, 'userSettings', user.uid), settings);
+        
+        // Show notification
+        const notification = document.getElementById('saveNotification');
+        notification.classList.add('show');
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+        
+      } catch (err) {
+        console.error('Error saving settings:', err);
+        alert('Error saving settings: ' + err.message);
+      }
+    });
+
+    // Export CSV
+    document.getElementById('exportCSV').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please log in to export data');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const items = itemsSnapshot.docs.map(d => d.data());
+        
+        let csv = 'Term,Output,Cue,Goal,Priority,Status,Date Added\n';
+        items.forEach(item => {
+          csv += `"${item.term}","${item.output}","${item.cue}","${item.goal}","${item.priority}","${item.status}","${item.dateAdded?.toDate?.() || ''}"\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `loop-catcher-export-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Error exporting data: ' + err.message);
+      }
+    });
+
+    // Export JSON
+    document.getElementById('exportJSON').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please log in to export data');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const items = itemsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        const exportData = {
+          exportDate: new Date().toISOString(),
+          itemCount: items.length,
+          items
+        };
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `loop-catcher-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Error exporting data: ' + err.message);
+      }
+    });
+
+    // Delete all data
+    document.getElementById('deleteAllData').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please log in to delete data');
+        return;
+      }
+
+      const confirmed = confirm('⚠️ WARNING: This will permanently delete ALL your ideas and cannot be undone. Are you absolutely sure?');
+      if (!confirmed) return;
+
+      const doubleConfirm = prompt('Type "DELETE ALL" to confirm:');
+      if (doubleConfirm !== 'DELETE ALL') {
+        alert('Deletion cancelled');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const deletePromises = itemsSnapshot.docs.map(d => deleteDoc(doc(db, 'items', d.id)));
+        await Promise.all(deletePromises);
+        
+        alert('✅ All data has been deleted');
+        window.location.href = 'app.html';
+        
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Error deleting data: ' + err.message);
+      }
+    });
+
+    // Initialize
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loadSettings();
+      }
+    });
+  </script>
+</body>
+</html
