@@ -163,6 +163,7 @@
       color: var(--text);
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .btn-small:hover {
@@ -241,6 +242,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
+      gap: 8px;
     }
 
     .prep-question-title {
@@ -552,39 +554,58 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Default prep questions
+    // Complete default prep questions
     const defaultPrepQuestions = [
-      { id: 1, title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
-      { id: 2, title: "Who is it for?", prompt: "Describe your primary audience." },
-      { id: 3, title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
-      { id: 4, title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
-      { id: 5, title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." }
+      { id: 'vision-1', section: 'Vision', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
+      { id: 'vision-2', section: 'Vision', title: "Who is it for?", prompt: "Describe your primary audience." },
+      { id: 'vision-3', section: 'Vision', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
+      { id: 'vision-4', section: 'Vision', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
+      { id: 'vision-5', section: 'Vision', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." },
+      
+      { id: 'essentials-1', section: 'Essentials', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin." },
+      { id: 'essentials-2', section: 'Essentials', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?" },
+      { id: 'essentials-3', section: 'Essentials', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?" },
+      { id: 'essentials-4', section: 'Essentials', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?" },
+      { id: 'essentials-5', section: 'Essentials', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?" },
+      
+      { id: 'firsttest-1', section: 'First Test', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?" },
+      { id: 'firsttest-2', section: 'First Test', title: "Core Action", prompt: "What's the first action users can take with it?" },
+      { id: 'firsttest-3', section: 'First Test', title: "Feedback Loop", prompt: "How will you know if it works?" },
+      { id: 'firsttest-4', section: 'First Test', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?" },
+      { id: 'firsttest-5', section: 'First Test', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?" }
     ];
 
-    let prepQuestions = [...defaultPrepQuestions];
+    let prepQuestions = JSON.parse(JSON.stringify(defaultPrepQuestions));
     let preferredTools = [];
+    let currentUser = null;
+
+    // Wait for auth
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        currentUser = user;
+        loadSettings();
+      } else {
+        console.log('No user logged in');
+      }
+    });
 
     // Load settings
     async function loadSettings() {
-      const user = auth.currentUser;
-      if (!user) return;
+      if (!currentUser) return;
 
       try {
-        const settingsDoc = await getDoc(doc(db, 'userSettings', user.uid));
+        const settingsDoc = await getDoc(doc(db, 'userSettings', currentUser.uid));
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
           
-          // Load prep questions
-          if (settings.prepQuestions) {
+          if (settings.prepQuestions && settings.prepQuestions.length > 0) {
             prepQuestions = settings.prepQuestions;
           }
           
-          // Load preferred tools
           if (settings.preferredTools) {
             preferredTools = settings.preferredTools;
           }
           
-          // Load other settings
           if (settings.defaultStorage) {
             document.getElementById('defaultStorage').value = settings.defaultStorage;
           }
@@ -612,6 +633,21 @@
           if (settings.darkMode !== undefined) {
             document.getElementById('darkModeToggle').classList.toggle('active', settings.darkMode);
           }
+
+          if (settings.reminders) {
+            if (settings.reminders.actNow) {
+              document.querySelector('[data-category="act-now"]').value = settings.reminders.actNow;
+            }
+            if (settings.reminders.buildMomentum) {
+              document.querySelector('[data-category="build-momentum"]').value = settings.reminders.buildMomentum;
+            }
+            if (settings.reminders.later) {
+              document.querySelector('[data-category="later"]').value = settings.reminders.later;
+            }
+            if (settings.reminders.parked) {
+              document.querySelector('[data-category="parked"]').value = settings.reminders.parked;
+            }
+          }
         }
         
         renderPrepQuestions();
@@ -627,37 +663,59 @@
       const list = document.getElementById('prepQuestionsList');
       list.innerHTML = '';
       
+      let currentSection = '';
+      
       prepQuestions.forEach((q, index) => {
+        if (q.section && q.section !== currentSection) {
+          currentSection = q.section;
+          const sectionHeader = document.createElement('div');
+          sectionHeader.style.cssText = 'font-weight: 600; color: var(--accent); margin: 16px 0 8px 0; font-size: 14px;';
+          sectionHeader.textContent = `${getSectionEmoji(q.section)} ${q.section}`;
+          list.appendChild(sectionHeader);
+        }
+        
         const item = document.createElement('div');
         item.className = 'prep-question-item';
         item.innerHTML = `
           <div class="prep-question-header">
-            <input type="text" class="setting-input" value="${q.title}" data-index="${index}" data-field="title" style="flex: 1; margin-right: 8px;" />
-            <button class="btn-small btn-remove" onclick="removePrepQuestion(${index})">Remove</button>
+            <input type="text" class="setting-input" value="${q.title}" data-index="${index}" data-field="title" style="flex: 1;" />
+            <button class="btn-small btn-remove" data-index="${index}">Remove</button>
           </div>
           <input type="text" class="setting-input" value="${q.prompt}" data-index="${index}" data-field="prompt" placeholder="Question prompt..." />
         `;
         list.appendChild(item);
       });
       
-      // Add event listeners
-      list.querySelectorAll('input').forEach(input => {
+      list.querySelectorAll('input[data-index]').forEach(input => {
         input.addEventListener('input', (e) => {
           const index = parseInt(e.target.dataset.index);
           const field = e.target.dataset.field;
           prepQuestions[index][field] = e.target.value;
         });
       });
+
+      list.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          prepQuestions.splice(index, 1);
+          renderPrepQuestions();
+        });
+      });
     }
 
-    window.removePrepQuestion = function(index) {
-      prepQuestions.splice(index, 1);
-      renderPrepQuestions();
-    };
+    function getSectionEmoji(section) {
+      const emojis = {
+        'Vision': '✨',
+        'Essentials': '🔧',
+        'First Test': '🧪'
+      };
+      return emojis[section] || '📝';
+    }
 
     document.getElementById('addPrepQuestion').addEventListener('click', () => {
       prepQuestions.push({
-        id: Date.now(),
+        id: 'custom-' + Date.now(),
+        section: 'Custom',
         title: 'New Question',
         prompt: 'Enter your prompt here...'
       });
@@ -675,25 +733,27 @@
         item.innerHTML = `
           <input type="text" class="setting-input" value="${tool.name}" data-index="${index}" data-field="name" placeholder="Tool name" />
           <input type="text" class="setting-input" value="${tool.url}" data-index="${index}" data-field="url" placeholder="https://..." />
-          <button class="btn-small btn-remove" onclick="removePreferredTool(${index})">Remove</button>
+          <button class="btn-small btn-remove" data-index="${index}">Remove</button>
         `;
         list.appendChild(item);
       });
       
-      // Add event listeners
-      list.querySelectorAll('input').forEach(input => {
+      list.querySelectorAll('input[data-index]').forEach(input => {
         input.addEventListener('input', (e) => {
           const index = parseInt(e.target.dataset.index);
           const field = e.target.dataset.field;
           preferredTools[index][field] = e.target.value;
         });
       });
-    }
 
-    window.removePreferredTool = function(index) {
-      preferredTools.splice(index, 1);
-      renderPreferredTools();
-    };
+      list.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          preferredTools.splice(index, 1);
+          renderPreferredTools();
+        });
+      });
+    }
 
     document.getElementById('addPreferredTool').addEventListener('click', () => {
       preferredTools.push({ name: '', url: '' });
@@ -707,8 +767,7 @@
 
     // Save settings
     document.getElementById('saveSettings').addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (!user) {
+      if (!currentUser) {
         alert('Please log in to save settings');
         return;
       }
@@ -732,14 +791,15 @@
       };
 
       try {
-        await setDoc(doc(db, 'userSettings', user.uid), settings);
+        await setDoc(doc(db, 'userSettings', currentUser.uid), settings);
         
-        // Show notification
         const notification = document.getElementById('saveNotification');
         notification.classList.add('show');
         setTimeout(() => {
           notification.classList.remove('show');
         }, 3000);
+        
+        console.log('✅ Settings saved successfully');
         
       } catch (err) {
         console.error('Error saving settings:', err);
@@ -749,8 +809,7 @@
 
     // Export CSV
     document.getElementById('exportCSV').addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (!user) {
+      if (!currentUser) {
         alert('Please log in to export data');
         return;
       }
@@ -761,7 +820,8 @@
         
         let csv = 'Term,Output,Cue,Goal,Priority,Status,Date Added\n';
         items.forEach(item => {
-          csv += `"${item.term}","${item.output}","${item.cue}","${item.goal}","${item.priority}","${item.status}","${item.dateAdded?.toDate?.() || ''}"\n`;
+          const dateAdded = item.dateAdded?.toDate?.() ? item.dateAdded.toDate().toISOString() : '';
+          csv += `"${item.term || ''}","${item.output || ''}","${item.cue || ''}","${item.goal || ''}","${item.priority || ''}","${item.status || ''}","${dateAdded}"\n`;
         });
         
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -779,8 +839,7 @@
 
     // Export JSON
     document.getElementById('exportJSON').addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (!user) {
+      if (!currentUser) {
         alert('Please log in to export data');
         return;
       }
@@ -810,8 +869,7 @@
 
     // Delete all data
     document.getElementById('deleteAllData').addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (!user) {
+      if (!currentUser) {
         alert('Please log in to delete data');
         return;
       }
@@ -838,13 +896,6 @@
         alert('Error deleting data: ' + err.message);
       }
     });
-
-    // Initialize
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        loadSettings();
-      }
-    });
   </script>
 </body>
-</html
+</html>
