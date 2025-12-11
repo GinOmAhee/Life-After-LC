@@ -89,48 +89,6 @@
       margin-bottom: 12px;
     }
 
-    /* Tabs */
-    .tabs-container {
-      margin-top: 12px;
-    }
-
-    .tabs-nav {
-      display: flex;
-      gap: 8px;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 20px;
-    }
-
-    .tab-btn {
-      padding: 10px 16px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s;
-      margin-bottom: -2px;
-    }
-
-    .tab-btn:hover {
-      color: var(--text);
-    }
-
-    .tab-btn.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
     .toggle-switch {
       position: relative;
       width: 48px;
@@ -276,40 +234,27 @@
       padding: 12px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .prep-question-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
+      align-items: center;
       margin-bottom: 8px;
-    }
-
-    .prep-question-number {
-      font-weight: 600;
-      color: var(--accent);
-      font-size: 13px;
-      min-width: 20px;
-    }
-
-    .prep-question-content {
-      flex: 1;
+      gap: 8px;
     }
 
     .prep-question-title {
       font-weight: 600;
       color: var(--text);
-      font-size: 14px;
-      margin-bottom: 4px;
+      font-size: 13px;
     }
 
     .prep-question-prompt {
       color: var(--text-muted);
-      font-size: 13px;
+      font-size: 12px;
       font-style: italic;
-      line-height: 1.5;
     }
 
     .reminder-grid {
@@ -343,7 +288,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       display: none;
       animation: slideIn 0.3s ease;
-      z-index: 1000;
     }
 
     .save-notification.show {
@@ -377,38 +321,12 @@
     <div class="settings-section">
       <h2>📋 Prep Stage Questions</h2>
       <div class="setting-item">
-        <div class="setting-label">Manage Prep Questions</div>
-        <div class="setting-description">Customize questions asked during the prep stage. Remove questions you don't need or add custom ones.</div>
+        <div class="setting-label">Custom Prep Questions</div>
+        <div class="setting-description">Add, edit, or remove questions asked during the prep stage</div>
         
-        <div class="tabs-container">
-          <div class="tabs-nav">
-            <button class="tab-btn active" data-tab="vision">✨ Vision</button>
-            <button class="tab-btn" data-tab="essentials">🔧 Essentials</button>
-            <button class="tab-btn" data-tab="firsttest">🧪 First Test</button>
-            <button class="tab-btn" data-tab="custom">📝 Custom</button>
-          </div>
-
-          <!-- Vision Tab -->
-          <div class="tab-content active" data-tab="vision">
-            <div class="prep-questions-list" id="visionQuestions"></div>
-          </div>
-
-          <!-- Essentials Tab -->
-          <div class="tab-content" data-tab="essentials">
-            <div class="prep-questions-list" id="essentialsQuestions"></div>
-          </div>
-
-          <!-- First Test Tab -->
-          <div class="tab-content" data-tab="firsttest">
-            <div class="prep-questions-list" id="firstTestQuestions"></div>
-          </div>
-
-          <!-- Custom Tab -->
-          <div class="tab-content" data-tab="custom">
-            <div class="prep-questions-list" id="customQuestions"></div>
-            <button class="btn-small btn-add" id="addCustomQuestion">+ Add Custom Question</button>
-          </div>
-        </div>
+        <div class="prep-questions-list" id="prepQuestionsList"></div>
+        
+        <button class="btn-small btn-add" id="addPrepQuestion">+ Add Custom Question</button>
       </div>
     </div>
 
@@ -636,50 +554,30 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Complete default prep questions organized by section
-    const defaultPrepQuestions = {
-      vision: [
-        { id: 'vision-1', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
-        { id: 'vision-2', title: "Who is it for?", prompt: "Describe your primary audience." },
-        { id: 'vision-3', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
-        { id: 'vision-4', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
-        { id: 'vision-5', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." }
-      ],
-      essentials: [
-        { id: 'essentials-1', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin." },
-        { id: 'essentials-2', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?" },
-        { id: 'essentials-3', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?" },
-        { id: 'essentials-4', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?" },
-        { id: 'essentials-5', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?" }
-      ],
-      firsttest: [
-        { id: 'firsttest-1', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?" },
-        { id: 'firsttest-2', title: "Core Action", prompt: "What's the first action users can take with it?" },
-        { id: 'firsttest-3', title: "Feedback Loop", prompt: "How will you know if it works?" },
-        { id: 'firsttest-4', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?" },
-        { id: 'firsttest-5', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?" }
-      ],
-      custom: []
-    };
+    // Complete default prep questions
+    const defaultPrepQuestions = [
+      { id: 'vision-1', section: 'Vision', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
+      { id: 'vision-2', section: 'Vision', title: "Who is it for?", prompt: "Describe your primary audience." },
+      { id: 'vision-3', section: 'Vision', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
+      { id: 'vision-4', section: 'Vision', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
+      { id: 'vision-5', section: 'Vision', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." },
+      
+      { id: 'essentials-1', section: 'Essentials', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin." },
+      { id: 'essentials-2', section: 'Essentials', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?" },
+      { id: 'essentials-3', section: 'Essentials', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?" },
+      { id: 'essentials-4', section: 'Essentials', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?" },
+      { id: 'essentials-5', section: 'Essentials', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?" },
+      
+      { id: 'firsttest-1', section: 'First Test', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?" },
+      { id: 'firsttest-2', section: 'First Test', title: "Core Action", prompt: "What's the first action users can take with it?" },
+      { id: 'firsttest-3', section: 'First Test', title: "Feedback Loop", prompt: "How will you know if it works?" },
+      { id: 'firsttest-4', section: 'First Test', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?" },
+      { id: 'firsttest-5', section: 'First Test', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?" }
+    ];
 
     let prepQuestions = JSON.parse(JSON.stringify(defaultPrepQuestions));
     let preferredTools = [];
     let currentUser = null;
-
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
-        
-        // Update button states
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Update content visibility
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelector(`.tab-content[data-tab="${tab}"]`).classList.add('active');
-      });
-    });
 
     // Wait for auth
     auth.onAuthStateChanged((user) => {
@@ -688,7 +586,6 @@
         loadSettings();
       } else {
         console.log('No user logged in');
-        renderPrepQuestions();
       }
     });
 
@@ -701,7 +598,7 @@
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
           
-          if (settings.prepQuestions) {
+          if (settings.prepQuestions && settings.prepQuestions.length > 0) {
             prepQuestions = settings.prepQuestions;
           }
           
@@ -761,63 +658,66 @@
       }
     }
 
-    // Render prep questions by section
+    // Render prep questions
     function renderPrepQuestions() {
-      renderSectionQuestions('vision', 'visionQuestions');
-      renderSectionQuestions('essentials', 'essentialsQuestions');
-      renderSectionQuestions('firsttest', 'firstTestQuestions');
-      renderSectionQuestions('custom', 'customQuestions');
-    }
-
-    function renderSectionQuestions(section, containerId) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
+      const list = document.getElementById('prepQuestionsList');
+      list.innerHTML = '';
       
-      const questions = prepQuestions[section] || [];
+      let currentSection = '';
       
-      if (questions.length === 0 && section !== 'custom') {
-        container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No questions in this section.</p>';
-        return;
-      }
-      
-      if (questions.length === 0 && section === 'custom') {
-        container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">No custom questions yet. Click the button below to add one.</p>';
-        return;
-      }
-      
-      questions.forEach((q, index) => {
+      prepQuestions.forEach((q, index) => {
+        if (q.section && q.section !== currentSection) {
+          currentSection = q.section;
+          const sectionHeader = document.createElement('div');
+          sectionHeader.style.cssText = 'font-weight: 600; color: var(--accent); margin: 16px 0 8px 0; font-size: 14px;';
+          sectionHeader.textContent = `${getSectionEmoji(q.section)} ${q.section}`;
+          list.appendChild(sectionHeader);
+        }
+        
         const item = document.createElement('div');
         item.className = 'prep-question-item';
         item.innerHTML = `
           <div class="prep-question-header">
-            <span class="prep-question-number">${index + 1}.</span>
-            <div class="prep-question-content">
-              <div class="prep-question-title">${q.title}</div>
-              <div class="prep-question-prompt">${q.prompt}</div>
-            </div>
-            <button class="btn-small btn-remove" data-section="${section}" data-index="${index}">Remove</button>
+            <input type="text" class="setting-input" value="${q.title}" data-index="${index}" data-field="title" style="flex: 1;" />
+            <button class="btn-small btn-remove" data-index="${index}">Remove</button>
           </div>
+          <input type="text" class="setting-input" value="${q.prompt}" data-index="${index}" data-field="prompt" placeholder="Question prompt..." />
         `;
-        container.appendChild(item);
+        list.appendChild(item);
       });
       
-      // Attach remove listeners
-      container.querySelectorAll('.btn-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const section = e.target.dataset.section;
+      list.querySelectorAll('input[data-index]').forEach(input => {
+        input.addEventListener('input', (e) => {
           const index = parseInt(e.target.dataset.index);
-          prepQuestions[section].splice(index, 1);
+          const field = e.target.dataset.field;
+          prepQuestions[index][field] = e.target.value;
+        });
+      });
+
+      list.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          prepQuestions.splice(index, 1);
           renderPrepQuestions();
         });
       });
     }
 
-    // Add custom question
-    document.getElementById('addCustomQuestion').addEventListener('click', () => {
-      prepQuestions.custom.push({
+    function getSectionEmoji(section) {
+      const emojis = {
+        'Vision': '✨',
+        'Essentials': '🔧',
+        'First Test': '🧪'
+      };
+      return emojis[section] || '📝';
+    }
+
+    document.getElementById('addPrepQuestion').addEventListener('click', () => {
+      prepQuestions.push({
         id: 'custom-' + Date.now(),
-        title: 'New Custom Question',
-        prompt: 'Enter your question prompt here...'
+        section: 'Custom',
+        title: 'New Question',
+        prompt: 'Enter your prompt here...'
       });
       renderPrepQuestions();
     });
@@ -828,3 +728,174 @@
       list.innerHTML = '';
       
       preferredTools.forEach((tool, index) => {
+        const item = document.createElement('div');
+        item.className = 'custom-list-item';
+        item.innerHTML = `
+          <input type="text" class="setting-input" value="${tool.name}" data-index="${index}" data-field="name" placeholder="Tool name" />
+          <input type="text" class="setting-input" value="${tool.url}" data-index="${index}" data-field="url" placeholder="https://..." />
+          <button class="btn-small btn-remove" data-index="${index}">Remove</button>
+        `;
+        list.appendChild(item);
+      });
+      
+      list.querySelectorAll('input[data-index]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          preferredTools[index][field] = e.target.value;
+        });
+      });
+
+      list.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          preferredTools.splice(index, 1);
+          renderPreferredTools();
+        });
+      });
+    }
+
+    document.getElementById('addPreferredTool').addEventListener('click', () => {
+      preferredTools.push({ name: '', url: '' });
+      renderPreferredTools();
+    });
+
+    // Dark mode toggle
+    document.getElementById('darkModeToggle').addEventListener('click', (e) => {
+      e.target.classList.toggle('active');
+    });
+
+    // Save settings
+    document.getElementById('saveSettings').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to save settings');
+        return;
+      }
+
+      const settings = {
+        prepQuestions,
+        preferredTools,
+        defaultStorage: document.getElementById('defaultStorage').value,
+        fontSize: document.getElementById('fontSize').value,
+        layoutDensity: document.getElementById('layoutDensity').value,
+        timezone: document.getElementById('timezone').value,
+        dndStart: document.getElementById('dndStart').value,
+        dndEnd: document.getElementById('dndEnd').value,
+        darkMode: document.getElementById('darkModeToggle').classList.contains('active'),
+        reminders: {
+          actNow: document.querySelector('[data-category="act-now"]').value,
+          buildMomentum: document.querySelector('[data-category="build-momentum"]').value,
+          later: document.querySelector('[data-category="later"]').value,
+          parked: document.querySelector('[data-category="parked"]').value
+        }
+      };
+
+      try {
+        await setDoc(doc(db, 'userSettings', currentUser.uid), settings);
+        
+        const notification = document.getElementById('saveNotification');
+        notification.classList.add('show');
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 3000);
+        
+        console.log('✅ Settings saved successfully');
+        
+      } catch (err) {
+        console.error('Error saving settings:', err);
+        alert('Error saving settings: ' + err.message);
+      }
+    });
+
+    // Export CSV
+    document.getElementById('exportCSV').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to export data');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const items = itemsSnapshot.docs.map(d => d.data());
+        
+        let csv = 'Term,Output,Cue,Goal,Priority,Status,Date Added\n';
+        items.forEach(item => {
+          const dateAdded = item.dateAdded?.toDate?.() ? item.dateAdded.toDate().toISOString() : '';
+          csv += `"${item.term || ''}","${item.output || ''}","${item.cue || ''}","${item.goal || ''}","${item.priority || ''}","${item.status || ''}","${dateAdded}"\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `loop-catcher-export-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Error exporting data: ' + err.message);
+      }
+    });
+
+    // Export JSON
+    document.getElementById('exportJSON').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to export data');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const items = itemsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        const exportData = {
+          exportDate: new Date().toISOString(),
+          itemCount: items.length,
+          items
+        };
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `loop-catcher-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Error exporting data: ' + err.message);
+      }
+    });
+
+    // Delete all data
+    document.getElementById('deleteAllData').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to delete data');
+        return;
+      }
+
+      const confirmed = confirm('⚠️ WARNING: This will permanently delete ALL your ideas and cannot be undone. Are you absolutely sure?');
+      if (!confirmed) return;
+
+      const doubleConfirm = prompt('Type "DELETE ALL" to confirm:');
+      if (doubleConfirm !== 'DELETE ALL') {
+        alert('Deletion cancelled');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const deletePromises = itemsSnapshot.docs.map(d => deleteDoc(doc(db, 'items', d.id)));
+        await Promise.all(deletePromises);
+        
+        alert('✅ All data has been deleted');
+        window.location.href = 'app.html';
+        
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Error deleting data: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
