@@ -58,6 +58,12 @@ if (auth && isFirebaseConfigured) {
 }
 
 const logoutBtn = document.getElementById('logoutBtn');
+const settingsBtn = document.getElementById('settingsBtn');
+
+settingsBtn.addEventListener('click', () => {
+  window.location.href = 'settings.html';
+});
+
 logoutBtn.addEventListener('click', async () => {
   if (!auth) {
     alert('Firebase Auth not configured');
