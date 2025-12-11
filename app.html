@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Loop Catcher — Workflow App</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Additional styles for clear button */
+    #input-sheet td:last-child {
+      display: flex;
+      gap: 6px;
+      flex-direction: column;
+    }
+
+    .clear-row-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      font-weight: 500;
+      padding: 6px 12px;
+      white-space: nowrap;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .clear-row-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -29,13 +54,6 @@
       <button data-view="🌿 Build Momentum">🌿 Build Momentum</button>
       <button data-view="⏳ Later, But Worth It">⏳ Later, But Worth It</button>
       <button data-view="📦 Parked Potential">📦 Parked Potential</button>
-      
-      <!-- SIDEBAR WIDGET (COMMENTED OUT) - Uncomment when ready to use ads
-      <div id="recommendedWidget" class="sidebar-widget">
-        <h3>💡 Recommended</h3>
-        <div id="widgetContent"></div>
-      </div>
-      -->
     </nav>
 
     <section id="content">
@@ -92,6 +110,7 @@
               </td>
               <td>
                 <button class="save-quick-btn">Save</button>
+                <button class="clear-row-btn">Clear</button>
               </td>
             </tr>
           </tbody>
@@ -177,4 +196,3 @@
   <script type="module" src="app.js"></script>
 </body>
 </html>
-
