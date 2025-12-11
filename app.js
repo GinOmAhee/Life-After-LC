@@ -75,88 +75,6 @@ logoutBtn.addEventListener('click', async () => {
   }
 });
 
-/* ========================================
-   SPONSORED ADS CONFIGURATION (COMMENTED OUT)
-   Uncomment when ready to use
-   ======================================== */
-
-/*
-// Ad/Sponsorship Configuration
-const sponsoredProducts = [
-  {
-    id: 'notion',
-    title: 'Notion - All-in-One Workspace',
-    description: 'Perfect for organizing your ideas and projects',
-    emoji: '📝',
-    link: 'https://notion.so',
-    tag: 'Productivity'
-  },
-  {
-    id: 'figma',
-    title: 'Figma - Design Tool',
-    description: 'Turn your ideas into visual designs',
-    emoji: '🎨',
-    link: 'https://figma.com',
-    tag: 'Design'
-  },
-  {
-    id: 'obsidian',
-    title: 'Obsidian - Knowledge Base',
-    description: 'Build your second brain',
-    emoji: '🧠',
-    link: 'https://obsidian.md',
-    tag: 'Knowledge'
-  },
-  {
-    id: 'linear',
-    title: 'Linear - Project Management',
-    description: 'Track progress on your big ideas',
-    emoji: '🚀',
-    link: 'https://linear.app',
-    tag: 'Project Mgmt'
-  }
-];
-
-let currentAdIndex = 0;
-
-function rotateAd() {
-  currentAdIndex = (currentAdIndex + 1) % sponsoredProducts.length;
-  renderSidebarWidget();
-}
-
-function renderSidebarWidget() {
-  const widget = document.getElementById('widgetContent');
-  if (!widget) return;
-  
-  const product = sponsoredProducts[currentAdIndex];
-  
-  widget.innerHTML = `
-    <a href="${product.link}" target="_blank" class="widget-ad" data-ad-id="${product.id}">
-      <div class="widget-emoji">${product.emoji}</div>
-      <div class="widget-text">
-        <div class="widget-tag">Sponsored · ${product.tag}</div>
-        <div class="widget-title">${product.title}</div>
-        <div class="widget-desc">${product.description}</div>
-      </div>
-    </a>
-  `;
-  
-  // Track clicks
-  widget.querySelector('.widget-ad').addEventListener('click', () => {
-    console.log('📊 Ad clicked:', product.id);
-    // You can send this to analytics
-  });
-}
-
-// Rotate ad every 15 seconds
-setInterval(rotateAd, 15000);
-
-// Initial render
-setTimeout(renderSidebarWidget, 500);
-*/
-
-/* ======================================== */
-
 // Output category detection triggers
 const outputTriggers = {
   "🧱 Physical/Tangible": ["build", "make", "object", "thing", "device", "material", "ingredient", "recipe", "craft", "model", "prototype", "diy", "tool", "wearable", "machine", "consume", "gadget", "physical", "equipment"],
@@ -280,6 +198,14 @@ function debounce(func, wait) {
   };
 }
 
+// Clear all fields in a row
+function clearRow(row) {
+  row.querySelector('.term-input').value = '';
+  row.querySelector('.output-select').value = '';
+  row.querySelector('.cue-select').value = '';
+  row.querySelector('.goal-select').value = '';
+}
+
 async function autoSaveRow(row) {
   if (!db) {
     console.log('Firebase not configured - skipping auto-save');
@@ -330,10 +256,7 @@ async function autoSaveRow(row) {
     row.classList.add('saved');
     
     setTimeout(() => {
-      termInput.value = '';
-      outputSelect.value = '';
-      cueSelect.value = '';
-      goalSelect.value = '';
+      clearRow(row);
       row.classList.remove('saved');
     }, 500);
     
@@ -350,6 +273,16 @@ function setupAutoSave(row) {
   const cueSelect = row.querySelector('.cue-select');
   const goalSelect = row.querySelector('.goal-select');
   const saveBtn = row.querySelector('.save-quick-btn');
+  const clearBtn = row.querySelector('.clear-row-btn');
+
+  // Auto-clear other fields when term is deleted
+  termInput.addEventListener('input', () => {
+    if (termInput.value.trim() === '') {
+      outputSelect.value = '';
+      cueSelect.value = '';
+      goalSelect.value = '';
+    }
+  });
 
   // Auto-detect output when term changes
   const debouncedDetect = debounce(() => {
@@ -410,8 +343,7 @@ function setupAutoSave(row) {
       row.classList.add('saved');
       
       setTimeout(() => {
-        termInput.value = '';
-        outputSelect.value = '';
+        clearRow(row);
         row.classList.remove('saved');
       }, 500);
       
@@ -422,6 +354,13 @@ function setupAutoSave(row) {
       alert('Error saving: ' + err.message);
     }
   });
+
+  // Clear button
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      clearRow(row);
+    });
+  }
 }
 
 document.querySelectorAll('#input-body tr').forEach(row => {
@@ -500,7 +439,7 @@ function addSingleRow() {
     <td>
       <select class="cue-select">
         <option value="">Select cue</option>
-        <option value="✨ Relevant to Current Task">✨ Relevant to Current Task</option>
+        <option value="✨ Relevant to Current Concerns">✨ Relevant to Current Concerns</option>
         <option value="🏗️ Too Important/Foundational to Ignore">🏗️ Too Important/Foundational</option>
         <option value="🌱 Interesting, But Not Urgent">🌱 Interesting, But Not Urgent</option>
         <option value="👽 Not Related/Can Save for Later">👽 Not Related/Can Save for Later</option>
@@ -516,6 +455,7 @@ function addSingleRow() {
     </td>
     <td>
       <button class="save-quick-btn">Save</button>
+      <button class="clear-row-btn">Clear</button>
     </td>
   `;
   inputBodyEl.appendChild(newRow);
@@ -627,35 +567,6 @@ function renderView(view = currentView, items = []) {
 
   listEl.innerHTML = '';
   filtered.forEach((it, index) => {
-    /* ========================================
-       INLINE AD CARDS (COMMENTED OUT)
-       Uncomment when ready to use
-       ======================================== */
-    /*
-    // Insert sponsored ad card every 5 items
-    if (index > 0 && index % 5 === 0) {
-      const adProduct = sponsoredProducts[Math.floor(Math.random() * sponsoredProducts.length)];
-      const adCard = document.createElement('div');
-      adCard.className = 'card ad-card';
-      adCard.innerHTML = `
-        <div class="meta">
-          <div class="sponsored-label">Sponsored</div>
-          <h3>${adProduct.emoji} ${adProduct.title}</h3>
-          <p>${adProduct.description}</p>
-          <p style="color:var(--accent);font-size:12px;margin-top:8px">
-            ${adProduct.tag} · Click to learn more →
-          </p>
-        </div>
-      `;
-      adCard.style.cursor = 'pointer';
-      adCard.onclick = () => {
-        console.log('📊 Inline ad clicked:', adProduct.id);
-        window.open(adProduct.link, '_blank');
-      };
-      listEl.appendChild(adCard);
-    }
-    */
-    
     const card = document.createElement('div');
     card.className = 'card';
     
@@ -663,7 +574,7 @@ function renderView(view = currentView, items = []) {
     
     // Calculate progress percentage
     let completedStages = 0;
-    const totalStages = 4; // prep, create, review, launch
+    const totalStages = 4;
     
     if (it.prepCompleted || it.prepSkipped) completedStages++;
     if (it.createCompleted) completedStages++;
@@ -680,7 +591,6 @@ function renderView(view = currentView, items = []) {
           ${dateText ? 'Added ' + dateText : ''}
         </p>
         
-        <!-- Progress Bar -->
         <div class="progress-container">
           <div class="progress-label">
             <span style="font-size: 11px; color: var(--text-muted);">Progress</span>
@@ -707,7 +617,6 @@ function renderView(view = currentView, items = []) {
     `;
     listEl.appendChild(card);
 
-    // Get Started button - Check if prep completed, show Resume or Get Started
     const getStartedBtn = card.querySelector('.get-started');
     
     if (getStartedBtn) {
@@ -717,12 +626,11 @@ function renderView(view = currentView, items = []) {
         getStartedBtn.style.color = '#22c55e';
         getStartedBtn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
         
-        // Determine where to resume based on completion status
         getStartedBtn.onclick = () => {
           if (it.createCompleted && it.reviewCompleted) {
             alert('All stages complete! Ready to launch.');
           } else if (it.createCompleted) {
-            alert('Create complete! Click "Review Output" in the create page to mark review as done.');
+            alert('Create complete! Click "Choose File Location" in the create page to mark review as done.');
             window.location.href = `capture.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
           } else if (it.prepCompleted || it.prepSkipped) {
             window.location.href = `capture.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
@@ -737,7 +645,6 @@ function renderView(view = currentView, items = []) {
       }
     }
 
-    // Launch button
     const launchBtn = card.querySelector('.launch-btn');
     if (launchBtn) {
       launchBtn.onclick = () => openLaunchModal(it.id, it.term);
@@ -762,7 +669,6 @@ function renderView(view = currentView, items = []) {
   });
 }
 
-// Launch Modal Functions
 function openLaunchModal(ideaId, ideaTerm) {
   const modal = document.createElement('div');
   modal.className = 'launch-modal';
@@ -797,7 +703,6 @@ function openLaunchModal(ideaId, ideaTerm) {
   
   document.body.appendChild(modal);
   
-  // Add event listeners to options
   modal.querySelectorAll('.launch-option').forEach(btn => {
     btn.addEventListener('click', async () => {
       const action = btn.dataset.action;
