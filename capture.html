@@ -744,13 +744,17 @@
           }
         }
 
-        // For local option, just close modal
+        // Close modal immediately
+        fileLocationModal.classList.add('hidden');
+
+        // For local option, show tip
         if (type === 'local') {
           e.preventDefault();
-          fileLocationModal.classList.add('hidden');
-          alert('💡 Tip: Open your file explorer to access your local files');
+          setTimeout(() => {
+            alert('💡 Tip: Open your file explorer to access your local files');
+          }, 300);
         }
-        // For other options, the link will open naturally
+        // For other options, the link will open naturally in new tab
       });
     });
 
