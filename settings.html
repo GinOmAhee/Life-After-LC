@@ -360,6 +360,17 @@
         opacity: 1;
       }
     }
+
+    /* Light mode styles */
+    body.light-mode {
+      --bg: #ffffff;
+      --bg-elevated: #f8f9fa;
+      --border: rgba(0,0,0,0.1);
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14,165,233,0.15);
+    }
   </style>
 </head>
 <body>
@@ -666,19 +677,58 @@
     let preferredTools = [];
     let currentUser = null;
 
+    // Apply theme immediately on load
+    function applyTheme(darkMode) {
+      if (darkMode) {
+        document.body.classList.remove('light-mode');
+      } else {
+        document.body.classList.add('light-mode');
+      }
+    }
+
+    // Apply font size
+    function applyFontSize(size) {
+      const multipliers = { small: 0.9, medium: 1, large: 1.1 };
+      document.documentElement.style.fontSize = `${16 * (multipliers[size] || 1)}px`;
+    }
+
+    // Apply layout density
+    function applyLayoutDensity(density) {
+      const body = document.body;
+      body.classList.remove('compact', 'spacious');
+      if (density !== 'normal') {
+        body.classList.add(density);
+      }
+    }
+
     // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
         
-        // Update button states
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // Update content visibility
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.querySelector(`.tab-content[data-tab="${tab}"]`).classList.add('active');
       });
+    });
+
+    // Dark mode toggle with immediate effect
+    document.getElementById('darkModeToggle').addEventListener('click', (e) => {
+      e.target.classList.toggle('active');
+      const isDark = e.target.classList.contains('active');
+      applyTheme(isDark);
+    });
+
+    // Font size with immediate effect
+    document.getElementById('fontSize').addEventListener('change', (e) => {
+      applyFontSize(e.target.value);
+    });
+
+    // Layout density with immediate effect
+    document.getElementById('layoutDensity').addEventListener('change', (e) => {
+      applyLayoutDensity(e.target.value);
     });
 
     // Wait for auth
@@ -701,19 +751,8 @@
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
           
-          if (!settings.prepQuestions || Object.keys(settings.prepQuestions).length === 0) {
-            prepQuestions = JSON.parse(JSON.stringify(defaultPrepQuestions));
-          } else {
-            prepQuestions = {
-              ...defaultPrepQuestions,
-              ...settings.prepQuestions
-            };
-
-            ["vision", "essentials", "firsttest", "custom"].forEach(section => {
-              if (!Array.isArray(prepQuestions[section])) {
-                prepQuestions[section] = [...defaultPrepQuestions[section]];
-              }
-            });
+          if (settings.prepQuestions) {
+            prepQuestions = settings.prepQuestions;
           }
           
           if (settings.preferredTools) {
@@ -726,10 +765,12 @@
           
           if (settings.fontSize) {
             document.getElementById('fontSize').value = settings.fontSize;
+            applyFontSize(settings.fontSize);
           }
           
           if (settings.layoutDensity) {
             document.getElementById('layoutDensity').value = settings.layoutDensity;
+            applyLayoutDensity(settings.layoutDensity);
           }
           
           if (settings.timezone) {
@@ -745,7 +786,13 @@
           }
           
           if (settings.darkMode !== undefined) {
-            document.getElementById('darkModeToggle').classList.toggle('active', settings.darkMode);
+            const toggle = document.getElementById('darkModeToggle');
+            if (settings.darkMode) {
+              toggle.classList.add('active');
+            } else {
+              toggle.classList.remove('active');
+            }
+            applyTheme(settings.darkMode);
           }
 
           if (settings.reminders) {
@@ -769,6 +816,7 @@
         
       } catch (err) {
         console.error('Error loading settings:', err);
+        renderPrepQuestions();
       }
     }
 
@@ -812,7 +860,6 @@
         container.appendChild(item);
       });
       
-      // Attach remove listeners
       container.querySelectorAll('.btn-remove').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const section = e.target.dataset.section;
@@ -823,7 +870,6 @@
       });
     }
 
-    // Add custom question
     document.getElementById('addCustomQuestion').addEventListener('click', () => {
       prepQuestions.custom.push({
         id: 'custom-' + Date.now(),
@@ -831,12 +877,17 @@
         prompt: 'Enter your question prompt here...'
       });
       renderPrepQuestions();
+      document.querySelector('.tab-btn[data-tab="custom"]').click();
     });
 
-    // Render preferred tools
     function renderPreferredTools() {
       const list = document.getElementById('preferredToolsList');
       list.innerHTML = '';
+      
+      if (preferredTools.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">No preferred tools yet. Click the button below to add one.</p>';
+        return;
+      }
       
       preferredTools.forEach((tool, index) => {
         const item = document.createElement('div');
@@ -871,12 +922,6 @@
       renderPreferredTools();
     });
 
-    // Dark mode toggle
-    document.getElementById('darkModeToggle').addEventListener('click', (e) => {
-      e.target.classList.toggle('active');
-    });
-
-    // Save settings
     document.getElementById('saveSettings').addEventListener('click', async () => {
       if (!currentUser) {
         alert('Please log in to save settings');
@@ -918,7 +963,6 @@
       }
     });
 
-    // Export CSV
     document.getElementById('exportCSV').addEventListener('click', async () => {
       if (!currentUser) {
         alert('Please log in to export data');
@@ -948,7 +992,6 @@
       }
     });
 
-    // Export JSON
     document.getElementById('exportJSON').addEventListener('click', async () => {
       if (!currentUser) {
         alert('Please log in to export data');
@@ -978,7 +1021,6 @@
       }
     });
 
-    // Delete all data
     document.getElementById('deleteAllData').addEventListener('click', async () => {
       if (!currentUser) {
         alert('Please log in to delete data');
