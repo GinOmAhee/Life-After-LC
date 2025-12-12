@@ -802,8 +802,19 @@
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
           
-          if (settings.prepQuestions) {
-            prepQuestions = settings.prepQuestions;
+          if (!settings.prepQuestions || Object.keys(settings.prepQuestions).length === 0) {
+            prepQuestions = JSON.parse(JSON.stringify(defaultPrepQuestions));
+          } else {
+            prepQuestions = {
+              ...defaultPrepQuestions,
+              ...settings.prepQuestions
+            };
+
+            ["vision", "essentials", "firsttest", "custom"].forEach(section => {
+              if (!Array.isArray(prepQuestions[section])) {
+                prepQuestions[section] = [...defaultPrepQuestions[section]];
+              }
+            });
           }
           
           if (settings.preferredTools) {
