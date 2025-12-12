@@ -204,12 +204,393 @@ function debounce(func, wait) {
   };
 }
 
-// Clear all fields in a row
-function clearRow(row) {
-  row.querySelector('.term-input').value = '';
-  row.querySelector('.output-select').value = '';
-  row.querySelector('.cue-select').value = '';
-  row.querySelector('.goal-select').value = '';
+// ✅ GLOBALS
+let userSettings = {};
+let toolCategories = {};
+let showingAllTools = false;
+let matchedCategories = [];
+let skippedPrep = false;
+
+// For Create page DOM refs (will be null on other pages)
+let toolsSectionEl = null;
+let toolsListEl = null;
+let noSuggestionsEl = null;
+let toolSearchEl = null;
+let viewAllBtnEl = null;
+let fileLocationModal = null;
+let reviewOutputBtn = null;
+let closeModalBtn = null;
+
+toolCategories = {
+  writing: {
+    keywords: ['write', 'draft', 'compose', 'outline', 'summarize', 'clarify', 'edit', 'document', 'note', 'list', 'jot', 'quick draft', 'practice writing'],
+    emoji: '✍️',
+    title: 'Text Editors & Documentation',
+    tools: [
+      { name: 'Google Docs', url: 'docs.google.com', emoji: '📄' },
+      { name: 'Microsoft Word Online', url: 'office.com/word', emoji: '📝' },
+      { name: 'Notion', url: 'notion.so', emoji: '📓' },
+      { name: 'Evernote', url: 'evernote.com', emoji: '🗒️' },
+      { name: 'Obsidian', url: 'obsidian.md', emoji: '💎' },
+      { name: 'Process Street', url: 'process.st', emoji: '📋' },
+      { name: 'SweetProcess', url: 'sweetprocess.com', emoji: '🍬' },
+      { name: 'Confluence', url: 'atlassian.com/software/confluence', emoji: '🌊' }
+    ]
+  },
+  design: {
+    keywords: ['design', 'illustrate', 'sketch', 'render', 'mockup', 'storyboard', 'doodle', 'quick sketch', 'sample image', 'prototype'],
+    emoji: '🎨',
+    title: 'Design & Visual Tools',
+    tools: [
+      { name: 'Canva', url: 'canva.com', emoji: '🎨' },
+      { name: 'Adobe Photoshop', url: 'adobe.com/photoshop', emoji: '🖼️' },
+      { name: 'Figma', url: 'figma.com', emoji: '🔷' },
+      { name: 'Miro', url: 'miro.com', emoji: '🗺️' },
+      { name: 'Whimsical', url: 'whimsical.com', emoji: '✨' }
+    ]
+  },
+  data: {
+    keywords: ['analyze', 'calculate', 'chart', 'graph', 'compare', 'measure', 'assess', 'check numbers', 'quick review', 'sample calc', 'test data'],
+    emoji: '📊',
+    title: 'Data & Analytics',
+    tools: [
+      { name: 'Microsoft Excel', url: 'office.com/excel', emoji: '📗' },
+      { name: 'Google Sheets', url: 'sheets.google.com', emoji: '📊' },
+      { name: 'Tableau', url: 'tableau.com', emoji: '📈' },
+      { name: 'Power BI', url: 'powerbi.microsoft.com', emoji: '📉' },
+      { name: 'Looker Studio', url: 'lookerstudio.google.com', emoji: '📋' }
+    ]
+  },
+  research: {
+    keywords: ['research', 'discover', 'explore', 'investigate', 'validate', 'gather', 'quick search', 'look up', 'skim', 'check one source'],
+    emoji: '🔍',
+    title: 'Research & Discovery',
+    tools: [
+      { name: 'Google Search', url: 'google.com', emoji: '🔍' },
+      { name: 'Bing with Copilot', url: 'bing.com', emoji: '🤖' },
+      { name: 'Google Scholar', url: 'scholar.google.com', emoji: '🎓' },
+      { name: 'Perplexity AI', url: 'perplexity.ai', emoji: '🧠' },
+      { name: 'Semantic Scholar', url: 'semanticscholar.org', emoji: '📚' }
+    ]
+  },
+  shopping: {
+    keywords: ['buy', 'shop', 'compare', 'review', 'recommend', 'suggest', 'evaluate', 'check one item', 'quick browse', 'sample product'],
+    emoji: '🛒',
+    title: 'Shopping & E-commerce',
+    tools: [
+      { name: 'Amazon', url: 'amazon.com', emoji: '📦' },
+      { name: 'Shopee', url: 'shopee.ph', emoji: '🛍️' },
+      { name: 'Lazada', url: 'lazada.com.ph', emoji: '🏪' },
+      { name: 'Google Shopping', url: 'shopping.google.com', emoji: '🔍' }
+    ]
+  },
+  location: {
+    keywords: ['locate', 'map', 'directions', 'explore', 'recommend', 'discover', 'check nearby', 'quick lookup', 'one location', 'sample route'],
+    emoji: '🗺️',
+    title: 'Maps & Travel',
+    tools: [
+      { name: 'Google Maps', url: 'maps.google.com', emoji: '🗺️' },
+      { name: 'Waze', url: 'waze.com', emoji: '🚗' },
+      { name: 'TripAdvisor', url: 'tripadvisor.com', emoji: '✈️' },
+      { name: 'Booking.com', url: 'booking.com', emoji: '🏨' }
+    ]
+  },
+  video: {
+    keywords: ['watch', 'learn', 'demonstrate', 'record', 'stream', 'tutorial', 'walkthrough', 'quick clip', 'sample video', 'test recording', 'short demo'],
+    emoji: '🎥',
+    title: 'Video & Streaming',
+    tools: [
+      { name: 'YouTube', url: 'youtube.com', emoji: '📺' },
+      { name: 'Loom', url: 'loom.com', emoji: '🎬' },
+      { name: 'Vimeo', url: 'vimeo.com', emoji: '🎞️' },
+      { name: 'OBS Studio', url: 'obsproject.com', emoji: '📹' }
+    ]
+  },
+  communication: {
+    keywords: ['share', 'notify', 'message', 'update', 'collaborate', 'connect', 'mentor', 'send one email', 'post once', 'quick reply', 'test message'],
+    emoji: '💬',
+    title: 'Communication & Collaboration',
+    tools: [
+      { name: 'Gmail', url: 'gmail.com', emoji: '📧' },
+      { name: 'Slack', url: 'slack.com', emoji: '💬' },
+      { name: 'Microsoft Teams', url: 'teams.microsoft.com', emoji: '👥' },
+      { name: 'Discord', url: 'discord.com', emoji: '🎮' }
+    ]
+  },
+  management: {
+    keywords: ['manage', 'schedule', 'invoice', 'track', 'organize', 'plan', 'optimize', 'check one invoice', 'log one expense', 'sample schedule'],
+    emoji: '📋',
+    title: 'Project & Business Management',
+    tools: [
+      { name: 'Trello', url: 'trello.com', emoji: '📋' },
+      { name: 'Asana', url: 'asana.com', emoji: '✅' },
+      { name: 'ClickUp', url: 'clickup.com', emoji: '🎯' },
+      { name: 'Monday.com', url: 'monday.com', emoji: '📅' },
+      { name: 'Notion', url: 'notion.so', emoji: '📓' }
+    ]
+  },
+  brainstorm: {
+    keywords: ['brainstorm', 'imagine', 'innovate', 'prototype', 'experiment', 'try', 'test', 'start', 'pilot', 'smallest version', 'quick attempt'],
+    emoji: '💡',
+    title: 'Brainstorming & Prototyping',
+    tools: [
+      { name: 'Miro', url: 'miro.com', emoji: '🗺️' },
+      { name: 'Whimsical', url: 'whimsical.com', emoji: '✨' },
+      { name: 'Figma', url: 'figma.com', emoji: '🔷' },
+      { name: 'Notion', url: 'notion.so', emoji: '📓' },
+      { name: 'Obsidian', url: 'obsidian.md', emoji: '💎' }
+    ]
+  }
+};
+
+const storageUrls = {
+  gdrive: 'https://drive.google.com',
+  onedrive: 'https://onedrive.live.com',
+  dropbox: 'https://www.dropbox.com',
+  box: 'https://www.box.com',
+  amazon: 'https://www.amazon.com/photos',
+  mega: 'https://mega.io',
+  pcloud: 'https://www.pcloud.com',
+  sync: 'https://www.sync.com',
+  tresorit: 'https://tresorit.com',
+  icedrive: 'https://icedrive.net'
+};
+
+async function handleStorageSelection(type) {
+  const db = window.db;
+  const ideaId = window.ideaId;
+
+  if (ideaId && db) {
+    try {
+      await updateDoc(doc(db, 'items', ideaId), {
+        createCompleted: true,
+        createCompletedAt: serverTimestamp(),
+        reviewCompleted: true,
+        reviewCompletedAt: serverTimestamp(),
+        fileLocation: type
+      });
+      console.log('✅ Progress updated');
+    } catch (err) {
+      console.error('Error updating progress:', err);
+    }
+  }
+
+  if (fileLocationModal) {
+    fileLocationModal.classList.add('hidden');
+  }
+
+  if (type === 'local') {
+    setTimeout(() => {
+      alert('Tip: Open your file explorer to access your local files');
+    }, 300);
+  } else if (storageUrls[type]) {
+    window.open(storageUrls[type], '_blank');
+  }
+}
+
+// ✅ FUNCTIONS MOVED FROM capture.html
+async function loadAndSuggestTools() {
+  if (!ideaId || !db) {
+    document.getElementById('noSuggestions').classList.remove('hidden');
+    return;
+  }
+
+  try {
+    const ideaDoc = await getDoc(doc(db, 'items', ideaId));
+    
+    if (!ideaDoc.exists()) {
+      document.getElementById('noSuggestions').classList.remove('hidden');
+      return;
+    }
+
+    const ideaData = ideaDoc.data();
+    const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || "";
+    const prepSkipped = ideaData.prepSkipped === true;
+
+    // ✅ CASE 1: Preferred tools override everything
+    if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
+      document.getElementById('noSuggestions').classList.add('hidden');
+      renderTools([{ title: "Preferred", tools: userSettings.preferredTools, emoji: "⭐" }]);
+      return;
+    }
+
+    // ✅ CASE 3: User skipped prep → show ALL tools
+    if (prepSkipped || minVersion === "__skipped__") {
+      document.getElementById('noSuggestions').classList.add('hidden');
+      renderTools([]); // all tools
+      return;
+    }
+
+    // ✅ CASE 2: Prep answered but Minimum Version empty → show NO suggestions
+    if (!minVersion || minVersion.trim() === "") {
+      const msg = document.getElementById('noSuggestions');
+      msg.innerHTML = `
+        <p>Set the Minimum Version you can accomplish to see suggested tools, or view all tools.</p>
+      `;
+      msg.classList.remove('hidden');
+      return;
+    }
+
+    // ✅ Detect matching categories
+    matchedCategories = [];
+    for (const [key, category] of Object.entries(toolCategories)) {
+      const hasMatch = category.keywords.some(keyword =>
+        minVersion.includes(keyword.toLowerCase())
+      );
+      if (hasMatch) matchedCategories.push(category);
+    }
+
+    // ✅ If Minimum Version provided but no matches → show ALL tools
+    if (matchedCategories.length === 0) {
+      document.getElementById('noSuggestions').classList.add('hidden');
+      renderTools([]); // all tools
+      return;
+    }
+
+    // ✅ Otherwise show suggested categories
+    renderTools(matchedCategories);
+
+  } catch (err) {
+    console.error('Error loading idea data:', err);
+    document.getElementById('noSuggestions').classList.remove('hidden');
+  }
+}
+
+function renderTools(categories) {
+  const toolsList = document.getElementById('toolsList');
+  toolsList.innerHTML = '';
+
+  // ✅ If categories is empty → show ALL tools
+  if (!categories || categories.length === 0) {
+    document.getElementById('noSuggestions').classList.add('hidden');
+    renderAllTools();
+    return;
+  }
+
+  // ✅ Hide "no suggestions" because we have categories
+  document.getElementById('noSuggestions').classList.add('hidden');
+
+  // First, render preferred tools if user has them
+  if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
+    const preferredCategory = document.createElement('div');
+    preferredCategory.className = 'tool-category';
+    preferredCategory.dataset.category = 'preferred';
+        
+    preferredCategory.innerHTML = `
+      <h3>⭐ My Preferred Tools</h3>
+      <div class="tool-list">
+        ${userSettings.preferredTools.map(tool => {
+          if (!tool.name || !tool.url) return '';
+          const cleanUrl = tool.url.replace(/^https?:\/\//, '');
+          return `
+            <a href="${tool.url.startsWith('http') ? tool.url : 'https://' + tool.url}" target="_blank" class="tool-item" data-tool-name="${tool.name.toLowerCase()}">
+              <span class="tool-emoji">⭐</span>
+              <div class="tool-text">
+                <span class="tool-name">${tool.name}</span>
+                <span class="tool-url">${cleanUrl}</span>
+              </div>
+            </a>
+          `;
+        }).join('')}
+      </div>
+    `;
+        
+    toolsList.appendChild(preferredCategory);
+  }
+
+  // Then render suggested/all categories
+  categories.forEach(category => {
+    const categoryDiv = document.createElement('div');
+    categoryDiv.className = 'tool-category';
+    categoryDiv.dataset.category = category.title.toLowerCase();
+        
+    categoryDiv.innerHTML = `
+      <h3>${category.emoji} ${category.title}</h3>
+      <div class="tool-list">
+        ${category.tools.map(tool => `
+          <a href="https://${tool.url}" target="_blank" class="tool-item" data-tool-name="${tool.name.toLowerCase()}">
+            <span class="tool-emoji">${tool.emoji}</span>
+            <div class="tool-text">
+              <span class="tool-name">${tool.name}</span>
+              <span class="tool-url">${tool.url}</span>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+        
+    toolsList.appendChild(categoryDiv);
+  });
+}
+
+function renderAllTools() {
+  const toolsList = document.getElementById('toolsList');
+  toolsList.innerHTML = '';
+
+  document.getElementById('noSuggestions').classList.add('hidden');
+
+  Object.values(toolCategories).forEach(category => {
+    const categoryDiv = document.createElement('div');
+    categoryDiv.className = 'tool-category';
+    categoryDiv.dataset.category = category.title.toLowerCase();
+
+    categoryDiv.innerHTML = `
+      <h3>${category.emoji} ${category.title}</h3>
+      <div class="tool-list">
+        ${category.tools.map(tool => `
+          <a href="https://${tool.url}" target="_blank" class="tool-item" data-tool-name="${tool.name.toLowerCase()}">
+            <span class="tool-emoji">${tool.emoji}</span>
+            <div class="tool-text">
+              <span class="tool-name">${tool.name}</span>
+              <span class="tool-url">${tool.url}</span>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+
+    toolsList.appendChild(categoryDiv);
+  });
+}
+
+async function handleStorageSelection(type) {
+  // Mark stages as complete silently
+  if (ideaId && db) {
+    try {
+      await updateDoc(doc(db, 'items', ideaId), {
+        createCompleted: true,
+        createCompletedAt: serverTimestamp(),
+        reviewCompleted: true,
+        reviewCompletedAt: serverTimestamp(),
+        fileLocation: type
+      });
+      console.log('✅ Progress updated');
+    } catch (err) {
+      console.error('Error updating progress:', err);
+    }
+  }
+
+  // Close modal
+  fileLocationModal.classList.add('hidden');
+
+  // Handle local or open URL
+  if (type === 'local') {
+    setTimeout(() => {
+      alert('💡 Tip: Open your file explorer to access your local files');
+    }, 300);
+  } else if (storageUrls[type]) {
+    window.open(storageUrls[type], '_blank');
+  }
+}    
+
+async function loadUserSettingsSafely() {
+  try {
+    const stored = localStorage.getItem("userSettings");
+    return stored ? JSON.parse(stored) : {};
+  } catch (err) {
+    console.error("Error loading user settings:", err);
+    return {};
+  }
 }
 
 async function autoSaveRow(row) {
@@ -369,54 +750,13 @@ function setupAutoSave(row) {
   }
 }
 
-document.querySelectorAll('#input-body tr').forEach(row => {
-  setupAutoSave(row);
-});
-
-viewsEl.addEventListener('click', (e) => {
-  const btn = e.target.closest('button');
-  if (!btn) return;
-  selectView(btn.dataset.view);
-});
-
-newItemBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  if (currentView === "🤔 Idea Board") {
-    openRowCountModal();
-  } else {
-    openModal();
-  }
-});
-
-addRowBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  addSingleRow();
-});
-
-function openRowCountModal() {
-  rowCountModal.classList.remove('hidden');
-  rowCountInput.focus();
+// Clear all fields in a row
+function clearRow(row) {
+  row.querySelector('.term-input').value = '';
+  row.querySelector('.output-select').value = '';
+  row.querySelector('.cue-select').value = '';
+  row.querySelector('.goal-select').value = '';
 }
-
-function closeRowCountModal() {
-  rowCountModal.classList.add('hidden');
-}
-
-confirmRowCount.addEventListener('click', () => {
-  const count = parseInt(rowCountInput.value) || 1;
-  if (count < 1 || count > 20) {
-    alert('Please enter a number between 1 and 20');
-    return;
-  }
-  for (let i = 0; i < count; i++) {
-    addSingleRow();
-  }
-  closeRowCountModal();
-});
-
-cancelRowCount.addEventListener('click', () => {
-  closeRowCountModal();
-});
 
 function addSingleRow() {
   const newRow = document.createElement('tr');
@@ -467,6 +807,193 @@ function addSingleRow() {
   inputBodyEl.appendChild(newRow);
   setupAutoSave(newRow);
 }
+
+function openRowCountModal() {
+  rowCountModal.classList.remove('hidden');
+  rowCountInput.focus();
+}
+
+function closeRowCountModal() {
+  rowCountModal.classList.add('hidden');
+}
+
+function openLaunchModal(ideaId, ideaTerm) {
+  const modal = document.createElement('div');
+  modal.className = 'launch-modal';
+  modal.innerHTML = `
+    <div class="launch-modal-content">
+      <h2>🚀 Launch "${escapeHtml(ideaTerm)}"</h2>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">Choose what happens next:</p>
+      
+      <div class="launch-options">
+        <button class="launch-option" data-action="archive">
+          <div class="option-icon">📦</div>
+          <div class="option-text">
+            <strong>Launched & Archive</strong>
+            <span>Mark as complete and archive this idea</span>
+          </div>
+        </button>
+        
+        <button class="launch-option" data-action="testing">
+          <div class="option-icon">🧪</div>
+          <div class="option-text">
+            <strong>Launched & Move to User Testing</strong>
+            <span>Continue with user feedback phase</span>
+          </div>
+        </button>
+      </div>
+      
+      <div style="text-align: center; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="this.closest('.launch-modal').remove()">Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  modal.querySelectorAll('.launch-option').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const action = btn.dataset.action;
+      await handleLaunch(ideaId, action);
+      modal.remove();
+    });
+  });
+}
+
+async function handleLaunch(ideaId, action) {
+  if (!db) {
+    alert('Firebase not configured');
+    return;
+  }
+
+  try {
+    const updateData = {
+      launchCompleted: true,
+      launchCompletedAt: serverTimestamp(),
+      launchAction: action
+    };
+
+    if (action === 'archive') {
+      updateData.status = '📦 Archived';
+      updateData.archived = true;
+    } else if (action === 'testing') {
+      updateData.status = '🧪 User Testing';
+      updateData.inTesting = true;
+    }
+
+    await updateDoc(doc(db, 'items', ideaId), updateData);
+    
+    const actionText = action === 'archive' ? 'archived' : 'moved to user testing';
+    alert(`✅ Successfully launched and ${actionText}!`);
+    
+    console.log(`🚀 Launched: ${ideaId} - Action: ${action}`);
+  } catch (err) {
+    console.error('Launch error:', err);
+    alert('Error launching: ' + err.message);
+  }
+}
+
+function openModal(item = null) {
+  modal.classList.remove('hidden');
+  itemForm.reset();
+  itemForm.querySelector('[name=id]').value = item?.id || '';
+  itemForm.querySelector('[name=term]').value = item?.term || '';
+  itemForm.querySelector('[name=output]').value = item?.output || '';
+  itemForm.querySelector('[name=cue]').value = item?.cue || '';
+  itemForm.querySelector('[name=goal]').value = item?.goal || '';
+  document.getElementById('modalTitle').textContent = item ? 'Edit Item' : 'New Item';
+}
+
+function closeModal() {
+  modal.classList.add('hidden');
+  itemForm.reset();
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
+}
+
+// ✅ EVENT LISTENERS MOVED FROM capture.html
+// View All Tools button
+document.getElementById('viewAllBtn').addEventListener('click', () => {
+  showingAllTools = !showingAllTools;
+  const btn = document.getElementById('viewAllBtn');
+      
+  if (showingAllTools) {
+    btn.textContent = 'View Suggested Only';
+    renderTools([]); // empty array = show ALL tools
+  } else {
+    btn.textContent = 'View All Tools';
+    renderTools(matchedCategories.length > 0 ? matchedCategories : []);
+  }
+});
+
+// Search functionality
+document.getElementById('toolSearch').addEventListener('input', (e) => {
+  const searchTerm = e.target.value.toLowerCase();
+      
+  document.querySelectorAll('.tool-category').forEach(category => {
+    const tools = category.querySelectorAll('.tool-item');
+    let hasVisibleTool = false;
+        
+    tools.forEach(tool => {
+      const toolName = tool.dataset.toolName;
+      if (toolName.includes(searchTerm)) {
+        tool.style.display = 'flex';
+        hasVisibleTool = true;
+      } else {
+        tool.style.display = 'none';
+      }
+    });
+
+    category.classList.toggle('hidden', !hasVisibleTool);
+  });
+});
+
+// Handle location option clicks
+document.querySelectorAll('.location-option').forEach(option => {
+  option.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const type = option.dataset.type;
+    handleStorageSelection(type);
+  });
+});
+
+document.querySelectorAll('#input-body tr').forEach(row => {
+  setupAutoSave(row);
+});
+
+
+newItemBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (currentView === "🤔 Idea Board") {
+    openRowCountModal();
+  } else {
+    openModal();
+  }
+});
+
+addRowBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  addSingleRow();
+});
+
+confirmRowCount.addEventListener('click', () => {
+  const count = parseInt(rowCountInput.value) || 1;
+  if (count < 1 || count > 20) {
+    alert('Please enter a number between 1 and 20');
+    return;
+  }
+  for (let i = 0; i < count; i++) {
+    addSingleRow();
+  }
+  closeRowCountModal();
+});
+
+cancelRowCount.addEventListener('click', () => {
+  closeRowCountModal();
+});
 
 cancelBtn.addEventListener('click', (e) => {
   e.preventDefault();
@@ -675,101 +1202,91 @@ function renderView(view = currentView, items = []) {
   });
 }
 
-function openLaunchModal(ideaId, ideaTerm) {
-  const modal = document.createElement('div');
-  modal.className = 'launch-modal';
-  modal.innerHTML = `
-    <div class="launch-modal-content">
-      <h2>🚀 Launch "${escapeHtml(ideaTerm)}"</h2>
-      <p style="color: var(--text-muted); margin-bottom: 24px;">Choose what happens next:</p>
-      
-      <div class="launch-options">
-        <button class="launch-option" data-action="archive">
-          <div class="option-icon">📦</div>
-          <div class="option-text">
-            <strong>Launched & Archive</strong>
-            <span>Mark as complete and archive this idea</span>
-          </div>
-        </button>
-        
-        <button class="launch-option" data-action="testing">
-          <div class="option-icon">🧪</div>
-          <div class="option-text">
-            <strong>Launched & Move to User Testing</strong>
-            <span>Continue with user feedback phase</span>
-          </div>
-        </button>
-      </div>
-      
-      <div style="text-align: center; margin-top: 24px;">
-        <button class="btn btn-secondary" onclick="this.closest('.launch-modal').remove()">Cancel</button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  modal.querySelectorAll('.launch-option').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const action = btn.dataset.action;
-      await handleLaunch(ideaId, action);
-      modal.remove();
-    });
-  });
-}
+// ✅ INITIALIZER
+document.addEventListener("DOMContentLoaded", async () => {
+  userSettings = await loadUserSettingsSafely();
+  await loadAndSuggestTools();
+});
 
-async function handleLaunch(ideaId, action) {
-  if (!db) {
-    alert('Firebase not configured');
-    return;
-  }
+document.addEventListener("DOMContentLoaded", async () => {
+  // This runs for all pages, so guard by currentPage
+  if (window.currentPage === 'capture') {
+    toolsSectionEl = document.getElementById('toolsSection');
+    toolsListEl = document.getElementById('toolsList');
+    noSuggestionsEl = document.getElementById('noSuggestions');
+    toolSearchEl = document.getElementById('toolSearch');
+    viewAllBtnEl = document.getElementById('viewAllBtn');
+    fileLocationModal = document.getElementById('fileLocationModal');
+    reviewOutputBtn = document.getElementById('reviewOutputBtn');
+    closeModalBtn = document.getElementById('closeModalBtn');
 
-  try {
-    const updateData = {
-      launchCompleted: true,
-      launchCompletedAt: serverTimestamp(),
-      launchAction: action
-    };
+    // Load user settings from localStorage
+    userSettings = await loadUserSettingsSafely();
+    console.log("✅ User settings loaded in Create page:", userSettings);
 
-    if (action === 'archive') {
-      updateData.status = '📦 Archived';
-      updateData.archived = true;
-    } else if (action === 'testing') {
-      updateData.status = '🧪 User Testing';
-      updateData.inTesting = true;
+    // Event listeners
+    if (viewAllBtnEl) {
+      viewAllBtnEl.addEventListener('click', () => {
+        showingAllTools = !showingAllTools;
+        if (showingAllTools) {
+          viewAllBtnEl.textContent = 'View Suggested Only';
+          renderTools([]); // show ALL tools
+        } else {
+          viewAllBtnEl.textContent = 'View All Tools';
+          renderTools(matchedCategories.length > 0 ? matchedCategories : []);
+        }
+      });
     }
 
-    await updateDoc(doc(db, 'items', ideaId), updateData);
-    
-    const actionText = action === 'archive' ? 'archived' : 'moved to user testing';
-    alert(`✅ Successfully launched and ${actionText}!`);
-    
-    console.log(`🚀 Launched: ${ideaId} - Action: ${action}`);
-  } catch (err) {
-    console.error('Launch error:', err);
-    alert('Error launching: ' + err.message);
+    if (toolSearchEl) {
+      toolSearchEl.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.tool-category').forEach(category => {
+          const tools = category.querySelectorAll('.tool-item');
+          let hasVisibleTool = false;
+
+          tools.forEach(tool => {
+            const toolName = tool.dataset.toolName;
+            if (toolName.includes(searchTerm)) {
+              tool.style.display = 'flex';
+              hasVisibleTool = true;
+            } else {
+              tool.style.display = 'none';
+            }
+          });
+
+          category.classList.toggle('hidden', !hasVisibleTool);
+        });
+      });
+    }
+
+    if (reviewOutputBtn && fileLocationModal) {
+      reviewOutputBtn.addEventListener('click', () => {
+        if (userSettings?.defaultStorage && userSettings.defaultStorage !== '') {
+          handleStorageSelection(userSettings.defaultStorage);
+        } else {
+          fileLocationModal.classList.remove('hidden');
+        }
+      });
+    }
+
+    if (closeModalBtn && fileLocationModal) {
+      closeModalBtn.addEventListener('click', () => {
+        fileLocationModal.classList.add('hidden');
+      });
+    }
+
+    document.querySelectorAll('.location-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        const type = option.dataset.type;
+        handleStorageSelection(type);
+      });
+    });
+
+    // Finally, load tool suggestions
+    await loadAndSuggestTools();
   }
-}
 
-function openModal(item = null) {
-  modal.classList.remove('hidden');
-  itemForm.reset();
-  itemForm.querySelector('[name=id]').value = item?.id || '';
-  itemForm.querySelector('[name=term]').value = item?.term || '';
-  itemForm.querySelector('[name=output]').value = item?.output || '';
-  itemForm.querySelector('[name=cue]').value = item?.cue || '';
-  itemForm.querySelector('[name=goal]').value = item?.goal || '';
-  document.getElementById('modalTitle').textContent = item ? 'Edit Item' : 'New Item';
-}
-
-function closeModal() {
-  modal.classList.add('hidden');
-  itemForm.reset();
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
-}
-
-console.log('✅ App initialized');
+  console.log('✅ App initialized');
+});
