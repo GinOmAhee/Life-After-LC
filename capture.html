@@ -654,10 +654,11 @@
           return;
         }
 
-        // ✅ If Minimum Version is empty → show ALL tools
+        // ✅ If Minimum Version is empty → show NO suggestions
         if (!minVersion || minVersion.trim() === "") {
-          document.getElementById('noSuggestions').classList.add('hidden');
-          renderTools([]); // show all tools
+          const msg = document.getElementById('noSuggestions');
+          msg.innerHTML = `<p>Please state the Minimum Version you want to accomplish to get tool suggestions.</p>`;
+          msg.classList.remove('hidden');
           return;
         }
 
@@ -669,8 +670,10 @@
           }
         }
 
+        // ✅ If user answered Minimum Version but no categories matched → show ALL tools
         if (matchedCategories.length === 0) {
-          document.getElementById('noSuggestions').classList.remove('hidden');
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // show ALL tools
           return;
         }
 
