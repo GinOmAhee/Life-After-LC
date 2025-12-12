@@ -628,6 +628,7 @@
 
     let showingAllTools = false;
     let matchedCategories = [];
+    let skippedPrep = false;
 
     async function loadAndSuggestTools() {
       if (!ideaId || !db) {
@@ -646,8 +647,17 @@
         const ideaData = ideaDoc.data();
         const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || '';
 
-        if (!minVersion) {
-          document.getElementById('noSuggestions').classList.remove('hidden');
+        // ✅ If user skipped prep → show ALL tools
+        if (minVersion === "__skipped__") {
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // show all tools
+          return;
+        }
+
+        // ✅ If Minimum Version is empty → show ALL tools
+        if (!minVersion || minVersion.trim() === "") {
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // show all tools
           return;
         }
 
@@ -672,9 +682,24 @@
       }
     }
 
+    function skipPrep() {
+      skippedPrep = true;
+      window.location.href = 'create.html';
+    }
+
     function renderTools(categories) {
       const toolsList = document.getElementById('toolsList');
       toolsList.innerHTML = '';
+
+      // ✅ If categories is empty → show ALL tools
+      if (!categories || categories.length === 0) {
+        document.getElementById('noSuggestions').classList.add('hidden');
+        renderAllTools();
+        return;
+      }
+
+      // ✅ Hide "no suggestions" because we have categories
+      document.getElementById('noSuggestions').classList.add('hidden');
 
       // First, render preferred tools if user has them
       if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
@@ -842,4 +867,3 @@
   </script>
 </body>
 </html>
-
