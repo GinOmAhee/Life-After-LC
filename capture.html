@@ -764,7 +764,7 @@
       
       if (showingAllTools) {
         btn.textContent = 'View Suggested Only';
-        renderTools(Object.values(toolCategories));
+        renderTools([]); // empty array = show ALL tools
       } else {
         btn.textContent = 'View All Tools';
         renderTools(matchedCategories.length > 0 ? matchedCategories : []);
