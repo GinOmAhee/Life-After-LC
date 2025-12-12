@@ -388,6 +388,38 @@
       --accent: #0ea5e9;
       --accent-glow: rgba(14,165,233,0.15);
     }
+
+    /* Font size classes */
+    body.font-small {
+      font-size: 14px;
+    }
+
+    body.font-medium {
+      font-size: 16px;
+    }
+
+    body.font-large {
+      font-size: 18px;
+    }
+
+    /* Layout density classes */
+    body.layout-compact .settings-section {
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    body.layout-compact .setting-item {
+      padding: 12px 0;
+    }
+
+    body.layout-spacious .settings-section {
+      padding: 32px;
+      margin-bottom: 28px;
+    }
+
+    body.layout-spacious .setting-item {
+      padding: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -687,12 +719,30 @@
     let preferredTools = [];
     let currentUser = null;
 
+    // Apply saved theme/font/layout on page load
+    (function() {
+      const savedDarkMode = localStorage.getItem('loop-catcher-dark-mode');
+      const savedFontSize = localStorage.getItem('loop-catcher-font-size');
+      const savedLayoutDensity = localStorage.getItem('loop-catcher-layout-density');
+
+      if (savedDarkMode !== null) {
+        applyTheme(savedDarkMode === 'true');
+      }
+      if (savedFontSize) {
+        applyFontSize(savedFontSize);
+      }
+      if (savedLayoutDensity) {
+        applyLayoutDensity(savedLayoutDensity);
+      }
+    })();
+
     function applyTheme(darkMode) {
       if (darkMode) {
         document.body.classList.remove('light-mode');
       } else {
         document.body.classList.add('light-mode');
       }
+      localStorage.setItem('loop-catcher-dark-mode', darkMode);
     }
 
     function applyFontSize(size) {
