@@ -49,6 +49,16 @@
       font-size: 16px;
     }
 
+    .debug-info {
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 12px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
     .progress-bar {
       display: flex;
       justify-content: space-between;
@@ -317,6 +327,11 @@
       <p id="ideaTitle">Getting ready to work on your idea</p>
     </div>
 
+    <div class="debug-info" id="debugInfo" style="display: none;">
+      <strong>Debug Info:</strong>
+      <div id="debugContent"></div>
+    </div>
+
     <div class="progress-bar" id="progressBar">
       <div class="progress-step active" data-step="1">
         <div class="step-circle">1</div>
@@ -397,11 +412,18 @@
         currentUser = user;
         await loadSettings();
         renderSteps();
+      } else {
+        // No user, load defaults
+        loadDefaultQuestions();
+        renderSteps();
       }
     });
 
     async function loadSettings() {
-      if (!currentUser) return;
+      if (!currentUser) {
+        loadDefaultQuestions();
+        return;
+      }
 
       try {
         const settingsDoc = await getDoc(doc(db, 'userSettings', currentUser.uid));
@@ -410,22 +432,35 @@
           
           if (settings.prepQuestions) {
             // Filter only enabled questions
-            enabledQuestions.vision = settings.prepQuestions.vision?.filter(q => q.enabled) || [];
-            enabledQuestions.essentials = settings.prepQuestions.essentials?.filter(q => q.enabled) || [];
-            enabledQuestions.firsttest = settings.prepQuestions.firsttest?.filter(q => q.enabled) || [];
+            const visionEnabled = settings.prepQuestions.vision?.filter(q => q.enabled !== false) || [];
+            const essentialsEnabled = settings.prepQuestions.essentials?.filter(q => q.enabled !== false) || [];
+            const firsttestEnabled = settings.prepQuestions.firsttest?.filter(q => q.enabled !== false) || [];
+            
+            enabledQuestions.vision = visionEnabled;
+            enabledQuestions.essentials = essentialsEnabled;
+            enabledQuestions.firsttest = firsttestEnabled;
             
             // Add custom questions if they're enabled
             if (settings.prepQuestions.custom) {
-              const customEnabled = settings.prepQuestions.custom.filter(q => q.enabled);
-              // You can add custom questions to a specific section or create a new one
-              // For now, adding them to vision
+              const customEnabled = settings.prepQuestions.custom.filter(q => q.enabled !== false);
               enabledQuestions.vision = [...enabledQuestions.vision, ...customEnabled];
             }
+
+            console.log('✅ Loaded enabled questions:', enabledQuestions);
+            
+            // If all sections are empty, use defaults
+            if (enabledQuestions.vision.length === 0 && 
+                enabledQuestions.essentials.length === 0 && 
+                enabledQuestions.firsttest.length === 0) {
+              console.warn('⚠️ All questions disabled, loading defaults');
+              loadDefaultQuestions();
+            }
           } else {
-            // Use default questions if no settings
+            console.log('No prepQuestions in settings, using defaults');
             loadDefaultQuestions();
           }
         } else {
+          console.log('No settings document, using defaults');
           loadDefaultQuestions();
         }
       } catch (err) {
@@ -463,6 +498,16 @@
     function renderSteps() {
       const container = document.getElementById('stepsContainer');
       container.innerHTML = '';
+
+      // Show debug info
+      const debugInfo = document.getElementById('debugInfo');
+      const debugContent = document.getElementById('debugContent');
+      debugInfo.style.display = 'block';
+      debugContent.innerHTML = `
+        Vision: ${enabledQuestions.vision.length} questions<br>
+        Essentials: ${enabledQuestions.essentials.length} questions<br>
+        First Test: ${enabledQuestions.firsttest.length} questions
+      `;
 
       // Step 1: Vision
       if (enabledQuestions.vision.length > 0) {
