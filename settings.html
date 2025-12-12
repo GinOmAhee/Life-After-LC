@@ -89,7 +89,6 @@
       margin-bottom: 12px;
     }
 
-    /* Tabs */
     .tabs-container {
       margin-top: 12px;
     }
@@ -159,6 +158,20 @@
 
     .toggle-switch.active::after {
       transform: translateX(24px);
+    }
+
+    .toggle-switch-small {
+      width: 40px;
+      height: 20px;
+    }
+
+    .toggle-switch-small::after {
+      width: 16px;
+      height: 16px;
+    }
+
+    .toggle-switch-small.active::after {
+      transform: translateX(20px);
     }
 
     .setting-input {
@@ -277,13 +290,18 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       margin-bottom: 12px;
+      transition: opacity 0.3s;
+    }
+
+    .prep-question-item.disabled {
+      opacity: 0.5;
     }
 
     .prep-question-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
+      gap: 12px;
       margin-bottom: 8px;
     }
 
@@ -361,7 +379,6 @@
       }
     }
 
-    /* Light mode styles */
     body.light-mode {
       --bg: #ffffff;
       --bg-elevated: #f8f9fa;
@@ -388,8 +405,8 @@
     <div class="settings-section">
       <h2>📋 Prep Stage Questions</h2>
       <div class="setting-item">
-        <div class="setting-label">Manage Prep Questions</div>
-        <div class="setting-description">Customize questions asked during the prep stage. Remove questions you don't need or add custom ones.</div>
+        <div class="setting-label">Show/Hide Questions</div>
+        <div class="setting-description">Toggle questions on or off. Disabled questions won't appear during the prep stage.</div>
         
         <div class="tabs-container">
           <div class="tabs-nav">
@@ -399,22 +416,18 @@
             <button class="tab-btn" data-tab="custom">📝 Custom</button>
           </div>
 
-          <!-- Vision Tab -->
           <div class="tab-content active" data-tab="vision">
             <div class="prep-questions-list" id="visionQuestions"></div>
           </div>
 
-          <!-- Essentials Tab -->
           <div class="tab-content" data-tab="essentials">
             <div class="prep-questions-list" id="essentialsQuestions"></div>
           </div>
 
-          <!-- First Test Tab -->
           <div class="tab-content" data-tab="firsttest">
             <div class="prep-questions-list" id="firstTestQuestions"></div>
           </div>
 
-          <!-- Custom Tab -->
           <div class="tab-content" data-tab="custom">
             <div class="prep-questions-list" id="customQuestions"></div>
             <button class="btn-small btn-add" id="addCustomQuestion">+ Add Custom Question</button>
@@ -428,7 +441,7 @@
       <h2>📂 Default File Storage</h2>
       <div class="setting-item">
         <div class="setting-label">Preferred Storage Location</div>
-        <div class="setting-description">Set your default storage for quick access during review</div>
+        <div class="setting-description">Set your default storage. When set, this will be auto-selected during review.</div>
         
         <select class="setting-select" id="defaultStorage">
           <option value="">No default (always ask)</option>
@@ -451,8 +464,8 @@
     <div class="settings-section">
       <h2>🛠️ Preferred Creation Tools</h2>
       <div class="setting-item">
-        <div class="setting-label">My Tools</div>
-        <div class="setting-description">Add your preferred tools that will always show in the Create page</div>
+        <div class="setting-label">My Favorite Tools</div>
+        <div class="setting-description">Add your preferred tools. These will appear at the top of the tool list in the Create page.</div>
         
         <div class="custom-list" id="preferredToolsList"></div>
         
@@ -610,13 +623,11 @@
       </div>
     </div>
 
-    <!-- Save Button -->
     <div style="text-align: center; margin-top: 40px;">
       <button class="btn-primary" id="saveSettings">💾 Save All Settings</button>
     </div>
   </div>
 
-  <!-- Save Notification -->
   <div class="save-notification" id="saveNotification">
     ✅ Settings saved successfully!
   </div>
@@ -647,28 +658,27 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Complete default prep questions organized by section
     const defaultPrepQuestions = {
       vision: [
-        { id: 'vision-1', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
-        { id: 'vision-2', title: "Who is it for?", prompt: "Describe your primary audience." },
-        { id: 'vision-3', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
-        { id: 'vision-4', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
-        { id: 'vision-5', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." }
+        { id: 'vision-1', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters.", enabled: true },
+        { id: 'vision-2', title: "Who is it for?", prompt: "Describe your primary audience.", enabled: true },
+        { id: 'vision-3', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves.", enabled: true },
+        { id: 'vision-4', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience.", enabled: true },
+        { id: 'vision-5', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation.", enabled: true }
       ],
       essentials: [
-        { id: 'essentials-1', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin." },
-        { id: 'essentials-2', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?" },
-        { id: 'essentials-3', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?" },
-        { id: 'essentials-4', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?" },
-        { id: 'essentials-5', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?" }
+        { id: 'essentials-1', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin.", enabled: true },
+        { id: 'essentials-2', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?", enabled: true },
+        { id: 'essentials-3', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?", enabled: true },
+        { id: 'essentials-4', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?", enabled: true },
+        { id: 'essentials-5', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?", enabled: true }
       ],
       firsttest: [
-        { id: 'firsttest-1', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?" },
-        { id: 'firsttest-2', title: "Core Action", prompt: "What's the first action users can take with it?" },
-        { id: 'firsttest-3', title: "Feedback Loop", prompt: "How will you know if it works?" },
-        { id: 'firsttest-4', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?" },
-        { id: 'firsttest-5', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?" }
+        { id: 'firsttest-1', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?", enabled: true },
+        { id: 'firsttest-2', title: "Core Action", prompt: "What's the first action users can take with it?", enabled: true },
+        { id: 'firsttest-3', title: "Feedback Loop", prompt: "How will you know if it works?", enabled: true },
+        { id: 'firsttest-4', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?", enabled: true },
+        { id: 'firsttest-5', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?", enabled: true }
       ],
       custom: []
     };
@@ -677,7 +687,6 @@
     let preferredTools = [];
     let currentUser = null;
 
-    // Apply theme immediately on load
     function applyTheme(darkMode) {
       if (darkMode) {
         document.body.classList.remove('light-mode');
@@ -686,13 +695,11 @@
       }
     }
 
-    // Apply font size
     function applyFontSize(size) {
       const multipliers = { small: 0.9, medium: 1, large: 1.1 };
       document.documentElement.style.fontSize = `${16 * (multipliers[size] || 1)}px`;
     }
 
-    // Apply layout density
     function applyLayoutDensity(density) {
       const body = document.body;
       body.classList.remove('compact', 'spacious');
@@ -701,7 +708,6 @@
       }
     }
 
-    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
@@ -714,24 +720,20 @@
       });
     });
 
-    // Dark mode toggle with immediate effect
     document.getElementById('darkModeToggle').addEventListener('click', (e) => {
       e.target.classList.toggle('active');
       const isDark = e.target.classList.contains('active');
       applyTheme(isDark);
     });
 
-    // Font size with immediate effect
     document.getElementById('fontSize').addEventListener('change', (e) => {
       applyFontSize(e.target.value);
     });
 
-    // Layout density with immediate effect
     document.getElementById('layoutDensity').addEventListener('change', (e) => {
       applyLayoutDensity(e.target.value);
     });
 
-    // Wait for auth
     auth.onAuthStateChanged((user) => {
       if (user) {
         currentUser = user;
@@ -742,7 +744,6 @@
       }
     });
 
-    // Load settings
     async function loadSettings() {
       if (!currentUser) return;
 
@@ -820,7 +821,6 @@
       }
     }
 
-    // Render prep questions by section
     function renderPrepQuestions() {
       renderSectionQuestions('vision', 'visionQuestions');
       renderSectionQuestions('essentials', 'essentialsQuestions');
@@ -847,6 +847,10 @@
       questions.forEach((q, index) => {
         const item = document.createElement('div');
         item.className = 'prep-question-item';
+        if (!q.enabled) {
+          item.classList.add('disabled');
+        }
+        
         item.innerHTML = `
           <div class="prep-question-header">
             <span class="prep-question-number">${index + 1}.</span>
@@ -854,27 +858,34 @@
               <div class="prep-question-title">${q.title}</div>
               <div class="prep-question-prompt">${q.prompt}</div>
             </div>
-            <button class="btn-small btn-remove" data-section="${section}" data-index="${index}">Remove</button>
+            <div class="toggle-switch toggle-switch-small ${q.enabled ? 'active' : ''}" data-section="${section}" data-index="${index}"></div>
           </div>
         `;
         container.appendChild(item);
       });
       
-      container.querySelectorAll('.btn-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+      container.querySelectorAll('.toggle-switch').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
           const section = e.target.dataset.section;
           const index = parseInt(e.target.dataset.index);
-          prepQuestions[section].splice(index, 1);
+          prepQuestions[section][index].enabled = !prepQuestions[section][index].enabled;
           renderPrepQuestions();
         });
       });
     }
 
     document.getElementById('addCustomQuestion').addEventListener('click', () => {
+      const title = prompt('Enter question title:');
+      if (!title) return;
+      
+      const prompt_text = prompt('Enter question prompt:');
+      if (!prompt_text) return;
+      
       prepQuestions.custom.push({
         id: 'custom-' + Date.now(),
-        title: 'New Custom Question',
-        prompt: 'Enter your question prompt here...'
+        title: title,
+        prompt: prompt_text,
+        enabled: true
       });
       renderPrepQuestions();
       document.querySelector('.tab-btn[data-tab="custom"]').click();
@@ -893,8 +904,8 @@
         const item = document.createElement('div');
         item.className = 'custom-list-item';
         item.innerHTML = `
-          <input type="text" class="setting-input" value="${tool.name}" data-index="${index}" data-field="name" placeholder="Tool name" />
-          <input type="text" class="setting-input" value="${tool.url}" data-index="${index}" data-field="url" placeholder="https://..." />
+          <input type="text" class="setting-input" value="${tool.name || ''}" data-index="${index}" data-field="name" placeholder="Tool name" />
+          <input type="text" class="setting-input" value="${tool.url || ''}" data-index="${index}" data-field="url" placeholder="https://example.com" />
           <button class="btn-small btn-remove" data-index="${index}">Remove</button>
         `;
         list.appendChild(item);
@@ -911,8 +922,10 @@
       list.querySelectorAll('.btn-remove').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const index = parseInt(e.target.dataset.index);
-          preferredTools.splice(index, 1);
-          renderPreferredTools();
+          if (confirm('Remove this tool?')) {
+            preferredTools.splice(index, 1);
+            renderPreferredTools();
+          }
         });
       });
     }
