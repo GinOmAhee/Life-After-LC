@@ -477,6 +477,31 @@
       document.getElementById('ideaTitle').textContent = `Creating: ${decodeURIComponent(ideaTitle)}`;
     }
 
+    let userSettings = null;
+    let currentUser = null;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadUserSettings();
+        loadAndSuggestTools();
+      }
+    });
+
+    async function loadUserSettings() {
+      if (!currentUser) return;
+
+      try {
+        const settingsDoc = await getDoc(doc(db, 'userSettings', currentUser.uid));
+        if (settingsDoc.exists()) {
+          userSettings = settingsDoc.data();
+          console.log('✅ User settings loaded', userSettings);
+        }
+      } catch (err) {
+        console.error('Error loading user settings:', err);
+      }
+    }
+
     // All tool categories
     const toolCategories = {
       writing: {
