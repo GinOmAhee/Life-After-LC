@@ -931,7 +931,10 @@
       const container = document.getElementById(containerId);
       container.innerHTML = '';
       
-      const questions = prepQuestions[section] || [];
+      const questions = (prepQuestions[section] || []).map(q => ({
+        enabled: q.enabled !== false,
+        ...q
+      }));
       
       if (questions.length === 0 && section !== 'custom') {
         container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No questions in this section.</p>';
