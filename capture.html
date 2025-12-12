@@ -630,9 +630,20 @@
     let matchedCategories = [];
     let skippedPrep = false;
 
-    function skipPrep() {
-      skippedPrep = true;
-      window.location.href = 'create.html';
+    async function skipPrep() {
+      try {
+        await updateDoc(doc(db, 'items', ideaId), {
+          prepSkipped: true,
+          firstTest: {
+            minVersion: "__skipped__"
+          }
+        });
+
+        window.location.href = `create.html?id=${ideaId}`;
+      } catch (err) {
+        console.error("Error saving skip state:", err);
+        alert("Could not skip prep. Please try again.");
+      }
     }
 
     async function loadAndSuggestTools() {
