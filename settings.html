@@ -758,6 +758,32 @@
       }
     }
 
+    function normalizePrepQuestions(prep) {
+      // If it's already in the new structure, return as-is
+      if (prep.vision && prep.essentials && prep.firsttest) {
+        return prep;
+      }
+
+      // Otherwise convert old flat structure
+      const grouped = {
+        vision: [],
+        essentials: [],
+        firsttest: [],
+        custom: []
+      };
+
+      Object.values(prep).forEach(item => {
+        if (!item.id) return;
+
+        if (item.id.startsWith("vision-")) grouped.vision.push(item);
+        else if (item.id.startsWith("essentials-")) grouped.essentials.push(item);
+        else if (item.id.startsWith("firsttest-")) grouped.firsttest.push(item);
+        else grouped.custom.push(item);
+      });
+
+      return grouped;
+    }
+
     function mergeDefaults(defaults, saved) {
       const merged = [...saved];
 
@@ -765,7 +791,7 @@
         const exists = saved.some(savedItem => savedItem.id === defaultItem.id);
         if (!exists) merged.push(defaultItem);
       });
-      
+
       return merged;
     }  
 
