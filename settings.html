@@ -758,6 +758,17 @@
       }
     }
 
+    function mergeDefaults(defaults, saved) {
+      const merged = [...saved];
+
+      defaults.forEach(defaultItem => {
+        const exists = saved.some(savedItem => savedItem.id === defaultItem.id);
+        if (!exists) merged.push(defaultItem);
+      });
+      
+      return merged;
+    }  
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
@@ -799,23 +810,24 @@
 
       try {
         const settingsDoc = await getDoc(doc(db, 'userSettings', currentUser.uid));
+        
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
-          
-          if (!settings.prepQuestions || Object.keys(settings.prepQuestions).length === 0) {
-            prepQuestions = JSON.parse(JSON.stringify(defaultPrepQuestions));
-          } else {
-            prepQuestions = {
-              ...defaultPrepQuestions,
-              ...settings.prepQuestions
-            };
 
-            ["vision", "essentials", "firsttest", "custom"].forEach(section => {
-              if (!Array.isArray(prepQuestions[section])) {
-                prepQuestions[section] = [...defaultPrepQuestions[section]];
-              }
-            });
-          }
+          // Merge defaults with saved settings
+          prepQuestions = {
+            vision: mergeDefaults(defaultPrepQuestions.vision, settings.prepQuestions?.vision || []),
+            essentials: mergeDefaults(defaultPrepQuestions.essentials, settings.prepQuestions?.essentials || []),
+            firsttest: mergeDefaults(defaultPrepQuestions.firsttest, settings.prepQuestions?.firsttest || []),
+            custom: settings.prepQuestions?.custom || []
+          };
+
+          // ✅ Write merged version back to Firebase
+          await setDoc(
+            doc(db, 'userSettings', currentUser.uid),
+            { prepQuestions },
+            { merge: true }
+          );
           
           if (settings.preferredTools) {
             preferredTools = settings.preferredTools;
