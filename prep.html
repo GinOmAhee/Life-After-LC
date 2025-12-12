@@ -218,7 +218,6 @@
       color: var(--accent);
     }
 
-    /* Summary Page Styles */
     .summary-container {
       background: var(--bg-elevated);
       border: 1px solid var(--border);
@@ -333,128 +332,8 @@
       </div>
     </div>
 
-    <!-- Step 1: Vision -->
-    <div class="step-content active" data-step="1">
-      <h2 class="step-title">✨ Vision</h2>
-      <p class="step-subtitle">Clarify what you're building and why it matters</p>
-
-      <div class="form-field">
-        <label>Core Statement</label>
-        <span class="prompt">Write one sentence that captures your idea and why it matters.</span>
-        <textarea id="coreStatement" placeholder="A lightweight app that helps solo parents organize daily tasks with dignity and ease."></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Who is it for?</label>
-        <span class="prompt">Describe your primary audience.</span>
-        <input type="text" id="audience" placeholder="Solo parents balancing work and caregiving" />
-      </div>
-
-      <div class="form-field">
-        <label>Why will they need it?</label>
-        <span class="prompt">Explain the problem or pain point your idea solves.</span>
-        <textarea id="need" placeholder="They struggle with scattered workflows and need a central place to organize."></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>What outcome will it create?</label>
-        <span class="prompt">State the benefit or transformation users will experience.</span>
-        <textarea id="outcome" placeholder="They'll feel more in control of their day."></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Why does it matter to you?</label>
-        <span class="prompt">Connect the idea to your personal motivation.</span>
-        <textarea id="motivation" placeholder="I want to empower others with clarity and dignity."></textarea>
-      </div>
-
-      <div class="step-actions">
-        <button class="btn btn-secondary" onclick="skipPrep()">Skip to Capture</button>
-        <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
-      </div>
-    </div>
-
-    <!-- Step 2: Essentials -->
-    <div class="step-content" data-step="2">
-      <h2 class="step-title">🔧 Essentials</h2>
-      <p class="step-subtitle">Identify what you need to get started</p>
-
-      <div class="form-field">
-        <label>Core Resources</label>
-        <span class="prompt">List the minimum tools or materials you need to begin.</span>
-        <textarea id="resources" placeholder="Firebase Hosting + basic HTML"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Skills & Knowledge</label>
-        <span class="prompt">What skills or know-how are essential to move forward?</span>
-        <textarea id="skills" placeholder="Basic coding in JavaScript"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>People & Support</label>
-        <span class="prompt">Do you need collaborators, mentors, or a support network?</span>
-        <textarea id="people" placeholder="A friend to test the prototype"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Time & Space</label>
-        <span class="prompt">What dedicated time or environment will help you focus?</span>
-        <textarea id="timeSpace" placeholder="Two hours each weekend"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Constraints & Limits</label>
-        <span class="prompt">What boundaries do you need to respect (budget, tools, compliance)?</span>
-        <textarea id="constraints" placeholder="Budget of $50/month for hosting"></textarea>
-      </div>
-
-      <div class="step-actions">
-        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-        <button class="btn btn-primary" onclick="nextStep()">Next: First Test →</button>
-      </div>
-    </div>
-
-    <!-- Step 3: First Test -->
-    <div class="step-content" data-step="3">
-      <h2 class="step-title">🧪 First Test</h2>
-      <p class="step-subtitle">Plan your first experiment</p>
-
-      <div class="form-field">
-        <label>Minimum Version</label>
-        <span class="prompt">What's the simplest version of your idea you can create right now?</span>
-        <textarea id="minVersion" placeholder="A single-page prototype with 3 task slots"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Core Action</label>
-        <span class="prompt">What's the first action users can take with it?</span>
-        <textarea id="coreAction" placeholder="Add a task and mark it complete"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Feedback Loop</label>
-        <span class="prompt">How will you know if it works?</span>
-        <textarea id="feedback" placeholder="Ask 3 users if they felt less overwhelmed"></textarea>
-      </div>
-
-      <div class="form-field">
-        <label>Timeframe (Due Date)</label>
-        <span class="prompt">How quickly can you build and test this version?</span>
-        <input type="date" id="dueDate" />
-      </div>
-
-      <div class="form-field">
-        <label>Next Step if Positive</label>
-        <span class="prompt">If the test shows promise, what's the next logical step?</span>
-        <textarea id="nextStep" placeholder="Add recurring tasks and calendar integration"></textarea>
-      </div>
-
-      <div class="step-actions">
-        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-        <button class="btn btn-primary" onclick="completePrep()">Complete Prep →</button>
-      </div>
-    </div>
+    <!-- Dynamic step content will be inserted here -->
+    <div id="stepsContainer"></div>
 
     <!-- Summary Page -->
     <div class="summary-container" id="summaryContainer">
@@ -463,81 +342,11 @@
         <p style="color: var(--text-muted);">Here's your idea blueprint</p>
       </div>
 
-      <div class="summary-section">
-        <h3>✨ Vision</h3>
-        <div class="summary-item">
-          <strong>Core Statement</strong>
-          <p id="sum-coreStatement"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Who is it for?</strong>
-          <p id="sum-audience"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Why will they need it?</strong>
-          <p id="sum-need"></p>
-        </div>
-        <div class="summary-item">
-          <strong>What outcome will it create?</strong>
-          <p id="sum-outcome"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Why does it matter to you?</strong>
-          <p id="sum-motivation"></p>
-        </div>
-      </div>
-
-      <div class="summary-section">
-        <h3>🔧 Essentials</h3>
-        <div class="summary-item">
-          <strong>Core Resources</strong>
-          <p id="sum-resources"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Skills & Knowledge</strong>
-          <p id="sum-skills"></p>
-        </div>
-        <div class="summary-item">
-          <strong>People & Support</strong>
-          <p id="sum-people"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Time & Space</strong>
-          <p id="sum-timeSpace"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Constraints & Limits</strong>
-          <p id="sum-constraints"></p>
-        </div>
-      </div>
-
-      <div class="summary-section">
-        <h3>🧪 First Test</h3>
-        <div class="summary-item">
-          <strong>Minimum Version</strong>
-          <p id="sum-minVersion"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Core Action</strong>
-          <p id="sum-coreAction"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Feedback Loop</strong>
-          <p id="sum-feedback"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Due Date</strong>
-          <p id="sum-dueDate"></p>
-        </div>
-        <div class="summary-item">
-          <strong>Next Step if Positive</strong>
-          <p id="sum-nextStep"></p>
-        </div>
-      </div>
+      <div id="summaryContent"></div>
 
       <div class="summary-actions">
         <button class="btn btn-secondary" onclick="window.print()">🖨️ Print Summary</button>
-        <button class="btn btn-primary" onclick="goToCapture()">Continue to Capture →</button>
+        <button class="btn btn-primary" onclick="goToCapture()">Continue to Create →</button>
       </div>
     </div>
   </div>
@@ -548,6 +357,7 @@
     import {
       getFirestore,
       doc,
+      getDoc,
       updateDoc,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
@@ -565,7 +375,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Get idea details from URL params
     const urlParams = new URLSearchParams(window.location.search);
     const ideaId = urlParams.get('id');
     const ideaTitle = urlParams.get('title');
@@ -576,9 +385,191 @@
 
     let currentStep = 1;
     let prepData = {};
+    let enabledQuestions = {
+      vision: [],
+      essentials: [],
+      firsttest: []
+    };
+    let currentUser = null;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadSettings();
+        renderSteps();
+      }
+    });
+
+    async function loadSettings() {
+      if (!currentUser) return;
+
+      try {
+        const settingsDoc = await getDoc(doc(db, 'userSettings', currentUser.uid));
+        if (settingsDoc.exists()) {
+          const settings = settingsDoc.data();
+          
+          if (settings.prepQuestions) {
+            // Filter only enabled questions
+            enabledQuestions.vision = settings.prepQuestions.vision?.filter(q => q.enabled) || [];
+            enabledQuestions.essentials = settings.prepQuestions.essentials?.filter(q => q.enabled) || [];
+            enabledQuestions.firsttest = settings.prepQuestions.firsttest?.filter(q => q.enabled) || [];
+            
+            // Add custom questions if they're enabled
+            if (settings.prepQuestions.custom) {
+              const customEnabled = settings.prepQuestions.custom.filter(q => q.enabled);
+              // You can add custom questions to a specific section or create a new one
+              // For now, adding them to vision
+              enabledQuestions.vision = [...enabledQuestions.vision, ...customEnabled];
+            }
+          } else {
+            // Use default questions if no settings
+            loadDefaultQuestions();
+          }
+        } else {
+          loadDefaultQuestions();
+        }
+      } catch (err) {
+        console.error('Error loading settings:', err);
+        loadDefaultQuestions();
+      }
+    }
+
+    function loadDefaultQuestions() {
+      enabledQuestions = {
+        vision: [
+          { id: 'vision-1', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters." },
+          { id: 'vision-2', title: "Who is it for?", prompt: "Describe your primary audience." },
+          { id: 'vision-3', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves." },
+          { id: 'vision-4', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience." },
+          { id: 'vision-5', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation." }
+        ],
+        essentials: [
+          { id: 'essentials-1', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin." },
+          { id: 'essentials-2', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?" },
+          { id: 'essentials-3', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?" },
+          { id: 'essentials-4', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?" },
+          { id: 'essentials-5', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?" }
+        ],
+        firsttest: [
+          { id: 'firsttest-1', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?" },
+          { id: 'firsttest-2', title: "Core Action", prompt: "What's the first action users can take with it?" },
+          { id: 'firsttest-3', title: "Feedback Loop", prompt: "How will you know if it works?" },
+          { id: 'firsttest-4', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?" },
+          { id: 'firsttest-5', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?" }
+        ]
+      };
+    }
+
+    function renderSteps() {
+      const container = document.getElementById('stepsContainer');
+      container.innerHTML = '';
+
+      // Step 1: Vision
+      if (enabledQuestions.vision.length > 0) {
+        const visionStep = document.createElement('div');
+        visionStep.className = 'step-content active';
+        visionStep.dataset.step = '1';
+        
+        let fieldsHTML = '';
+        enabledQuestions.vision.forEach(q => {
+          const fieldId = q.id;
+          fieldsHTML += `
+            <div class="form-field">
+              <label>${q.title}</label>
+              <span class="prompt">${q.prompt}</span>
+              <textarea id="${fieldId}" placeholder="${q.title}"></textarea>
+            </div>
+          `;
+        });
+        
+        visionStep.innerHTML = `
+          <h2 class="step-title">✨ Vision</h2>
+          <p class="step-subtitle">Clarify what you're building and why it matters</p>
+          ${fieldsHTML}
+          <div class="step-actions">
+            <button class="btn btn-secondary" onclick="skipPrep()">Skip to Create</button>
+            <button class="btn btn-primary" onclick="nextStep()">Next: Essentials →</button>
+          </div>
+        `;
+        container.appendChild(visionStep);
+      }
+
+      // Step 2: Essentials
+      if (enabledQuestions.essentials.length > 0) {
+        const essentialsStep = document.createElement('div');
+        essentialsStep.className = 'step-content';
+        essentialsStep.dataset.step = '2';
+        
+        let fieldsHTML = '';
+        enabledQuestions.essentials.forEach(q => {
+          const fieldId = q.id;
+          fieldsHTML += `
+            <div class="form-field">
+              <label>${q.title}</label>
+              <span class="prompt">${q.prompt}</span>
+              <textarea id="${fieldId}" placeholder="${q.title}"></textarea>
+            </div>
+          `;
+        });
+        
+        essentialsStep.innerHTML = `
+          <h2 class="step-title">🔧 Essentials</h2>
+          <p class="step-subtitle">Identify what you need to get started</p>
+          ${fieldsHTML}
+          <div class="step-actions">
+            <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Next: First Test →</button>
+          </div>
+        `;
+        container.appendChild(essentialsStep);
+      }
+
+      // Step 3: First Test
+      if (enabledQuestions.firsttest.length > 0) {
+        const firstTestStep = document.createElement('div');
+        firstTestStep.className = 'step-content';
+        firstTestStep.dataset.step = '3';
+        
+        let fieldsHTML = '';
+        enabledQuestions.firsttest.forEach(q => {
+          const fieldId = q.id;
+          const inputType = q.id === 'firsttest-4' ? 'date' : 'textarea';
+          
+          if (inputType === 'date') {
+            fieldsHTML += `
+              <div class="form-field">
+                <label>${q.title}</label>
+                <span class="prompt">${q.prompt}</span>
+                <input type="date" id="${fieldId}" />
+              </div>
+            `;
+          } else {
+            fieldsHTML += `
+              <div class="form-field">
+                <label>${q.title}</label>
+                <span class="prompt">${q.prompt}</span>
+                <textarea id="${fieldId}" placeholder="${q.title}"></textarea>
+              </div>
+            `;
+          }
+        });
+        
+        firstTestStep.innerHTML = `
+          <h2 class="step-title">🧪 First Test</h2>
+          <p class="step-subtitle">Plan your first experiment</p>
+          ${fieldsHTML}
+          <div class="step-actions">
+            <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+            <button class="btn btn-primary" onclick="completePrep()">Complete Prep →</button>
+          </div>
+        `;
+        container.appendChild(firstTestStep);
+      }
+    }
 
     window.nextStep = function() {
-      if (currentStep < 3) {
+      const totalSteps = document.querySelectorAll('.step-content').length;
+      if (currentStep < totalSteps) {
         document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
         document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('completed');
         document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
@@ -607,33 +598,37 @@
     };
 
     window.completePrep = async function() {
+      // Collect all answers
+      const answers = {
+        vision: {},
+        essentials: {},
+        firstTest: {}
+      };
+
+      enabledQuestions.vision.forEach(q => {
+        const el = document.getElementById(q.id);
+        if (el) answers.vision[q.id] = el.value;
+      });
+
+      enabledQuestions.essentials.forEach(q => {
+        const el = document.getElementById(q.id);
+        if (el) answers.essentials[q.id] = el.value;
+      });
+
+      enabledQuestions.firsttest.forEach(q => {
+        const el = document.getElementById(q.id);
+        if (el) answers.firstTest[q.id] = el.value;
+      });
+
       prepData = {
-        vision: {
-          coreStatement: document.getElementById('coreStatement').value,
-          audience: document.getElementById('audience').value,
-          need: document.getElementById('need').value,
-          outcome: document.getElementById('outcome').value,
-          motivation: document.getElementById('motivation').value
-        },
-        essentials: {
-          resources: document.getElementById('resources').value,
-          skills: document.getElementById('skills').value,
-          people: document.getElementById('people').value,
-          timeSpace: document.getElementById('timeSpace').value,
-          constraints: document.getElementById('constraints').value
-        },
-        firstTest: {
-          minVersion: document.getElementById('minVersion').value,
-          coreAction: document.getElementById('coreAction').value,
-          feedback: document.getElementById('feedback').value,
-          dueDate: document.getElementById('dueDate').value,
-          nextStep: document.getElementById('nextStep').value
-        },
+        vision: answers.vision,
+        essentials: answers.essentials,
+        firstTest: answers.firstTest,
         prepCompleted: true,
         prepCompletedAt: serverTimestamp()
       };
 
-      // Save to Firebase if we have an ideaId
+      // Save to Firebase
       if (ideaId && db) {
         try {
           await updateDoc(doc(db, 'items', ideaId), prepData);
@@ -643,35 +638,79 @@
         }
       }
 
-      // Show summary
       showSummary();
     };
 
     function showSummary() {
-      // Hide progress bar and steps
       document.getElementById('progressBar').style.display = 'none';
       document.querySelectorAll('.step-content').forEach(el => el.style.display = 'none');
 
-      // Populate summary
-      document.getElementById('sum-coreStatement').textContent = prepData.vision.coreStatement || 'Not provided';
-      document.getElementById('sum-audience').textContent = prepData.vision.audience || 'Not provided';
-      document.getElementById('sum-need').textContent = prepData.vision.need || 'Not provided';
-      document.getElementById('sum-outcome').textContent = prepData.vision.outcome || 'Not provided';
-      document.getElementById('sum-motivation').textContent = prepData.vision.motivation || 'Not provided';
+      const summaryContent = document.getElementById('summaryContent');
+      summaryContent.innerHTML = '';
 
-      document.getElementById('sum-resources').textContent = prepData.essentials.resources || 'Not provided';
-      document.getElementById('sum-skills').textContent = prepData.essentials.skills || 'Not provided';
-      document.getElementById('sum-people').textContent = prepData.essentials.people || 'Not provided';
-      document.getElementById('sum-timeSpace').textContent = prepData.essentials.timeSpace || 'Not provided';
-      document.getElementById('sum-constraints').textContent = prepData.essentials.constraints || 'Not provided';
+      // Vision summary
+      if (Object.keys(prepData.vision).length > 0) {
+        const visionSection = document.createElement('div');
+        visionSection.className = 'summary-section';
+        visionSection.innerHTML = '<h3>✨ Vision</h3>';
+        
+        enabledQuestions.vision.forEach(q => {
+          if (prepData.vision[q.id]) {
+            const item = document.createElement('div');
+            item.className = 'summary-item';
+            item.innerHTML = `
+              <strong>${q.title}</strong>
+              <p>${prepData.vision[q.id] || 'Not provided'}</p>
+            `;
+            visionSection.appendChild(item);
+          }
+        });
+        
+        summaryContent.appendChild(visionSection);
+      }
 
-      document.getElementById('sum-minVersion').textContent = prepData.firstTest.minVersion || 'Not provided';
-      document.getElementById('sum-coreAction').textContent = prepData.firstTest.coreAction || 'Not provided';
-      document.getElementById('sum-feedback').textContent = prepData.firstTest.feedback || 'Not provided';
-      document.getElementById('sum-dueDate').textContent = prepData.firstTest.dueDate || 'Not set';
-      document.getElementById('sum-nextStep').textContent = prepData.firstTest.nextStep || 'Not provided';
+      // Essentials summary
+      if (Object.keys(prepData.essentials).length > 0) {
+        const essentialsSection = document.createElement('div');
+        essentialsSection.className = 'summary-section';
+        essentialsSection.innerHTML = '<h3>🔧 Essentials</h3>';
+        
+        enabledQuestions.essentials.forEach(q => {
+          if (prepData.essentials[q.id]) {
+            const item = document.createElement('div');
+            item.className = 'summary-item';
+            item.innerHTML = `
+              <strong>${q.title}</strong>
+              <p>${prepData.essentials[q.id] || 'Not provided'}</p>
+            `;
+            essentialsSection.appendChild(item);
+          }
+        });
+        
+        summaryContent.appendChild(essentialsSection);
+      }
 
-      // Show summary
+      // First Test summary
+      if (Object.keys(prepData.firstTest).length > 0) {
+        const firstTestSection = document.createElement('div');
+        firstTestSection.className = 'summary-section';
+        firstTestSection.innerHTML = '<h3>🧪 First Test</h3>';
+        
+        enabledQuestions.firsttest.forEach(q => {
+          if (prepData.firstTest[q.id]) {
+            const item = document.createElement('div');
+            item.className = 'summary-item';
+            item.innerHTML = `
+              <strong>${q.title}</strong>
+              <p>${prepData.firstTest[q.id] || 'Not provided'}</p>
+            `;
+            firstTestSection.appendChild(item);
+          }
+        });
+        
+        summaryContent.appendChild(firstTestSection);
+      }
+
       document.getElementById('summaryContainer').classList.add('active');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -682,7 +721,6 @@
 
     window.skipPrep = async function() {
       if (confirm('Skip prep and go straight to create? You can always come back to this later.')) {
-        // Mark prep as skipped
         if (ideaId && db) {
           try {
             await updateDoc(doc(db, 'items', ideaId), {
