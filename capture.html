@@ -630,6 +630,11 @@
     let matchedCategories = [];
     let skippedPrep = false;
 
+    function skipPrep() {
+      skippedPrep = true;
+      window.location.href = 'create.html';
+    }
+
     async function loadAndSuggestTools() {
       if (!ideaId || !db) {
         document.getElementById('noSuggestions').classList.remove('hidden');
@@ -683,11 +688,6 @@
         console.error('Error loading idea data:', err);
         document.getElementById('noSuggestions').classList.remove('hidden');
       }
-    }
-
-    function skipPrep() {
-      skippedPrep = true;
-      window.location.href = 'create.html';
     }
 
     function renderTools(categories) {
