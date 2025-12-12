@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="styles.css" />
   <script src="global-settings.js"></script>
   <style>
-    /* Settings page specific styles */
     .settings-container {
       max-width: 900px;
       margin: 0 auto;
@@ -91,6 +90,47 @@
       margin-bottom: 12px;
     }
 
+    .tabs-container {
+      margin-top: 12px;
+    }
+
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     .toggle-switch {
       position: relative;
       width: 48px;
@@ -121,7 +161,21 @@
       transform: translateX(24px);
     }
 
-    .setting-input, .setting-select {
+    .toggle-switch-small {
+      width: 40px;
+      height: 20px;
+    }
+
+    .toggle-switch-small::after {
+      width: 16px;
+      height: 16px;
+    }
+
+    .toggle-switch-small.active::after {
+      transform: translateX(20px);
+    }
+
+    .setting-input {
       width: 100%;
       padding: 10px;
       background: var(--bg);
@@ -129,6 +183,64 @@
       border-radius: var(--radius);
       color: var(--text);
       font-size: 14px;
+    }
+
+    .setting-select {
+      width: 100%;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .custom-list {
+      margin-top: 12px;
+    }
+
+    .custom-list-item {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .custom-list-item input {
+      flex: 1;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-small:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-add {
+      margin-top: 8px;
+    }
+
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .btn-remove:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
     }
 
     .btn-primary {
@@ -145,6 +257,98 @@
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+    }
+
+    .btn-danger {
+      padding: 12px 24px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .prep-questions-list {
+      margin-top: 12px;
+    }
+
+    .prep-question-item {
+      background: var(--bg);
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      transition: opacity 0.3s;
+    }
+
+    .prep-question-item.disabled {
+      opacity: 0.5;
+    }
+
+    .prep-question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .prep-question-number {
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 13px;
+      min-width: 20px;
+    }
+
+    .prep-question-content {
+      flex: 1;
+    }
+
+    .prep-question-title {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .prep-question-prompt {
+      color: var(--text-muted);
+      font-size: 13px;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .reminder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .reminder-item {
+      background: var(--bg);
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .reminder-item-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
     .save-notification {
@@ -175,17 +379,6 @@
         opacity: 1;
       }
     }
-
-    /* Preview demo text */
-    .preview-text {
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text-muted);
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
@@ -197,6 +390,78 @@
     <div class="settings-header">
       <h1>⚙️ Settings</h1>
       <p>Customize your Loop Catcher experience</p>
+    </div>
+
+    <!-- Prep Questions -->
+    <div class="settings-section">
+      <h2>📋 Prep Stage Questions</h2>
+      <div class="setting-item">
+        <div class="setting-label">Show/Hide Questions</div>
+        <div class="setting-description">Toggle questions on or off. Disabled questions won't appear during the prep stage.</div>
+        
+        <div class="tabs-container">
+          <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="vision">✨ Vision</button>
+            <button class="tab-btn" data-tab="essentials">🔧 Essentials</button>
+            <button class="tab-btn" data-tab="firsttest">🧪 First Test</button>
+            <button class="tab-btn" data-tab="custom">📝 Custom</button>
+          </div>
+
+          <div class="tab-content active" data-tab="vision">
+            <div class="prep-questions-list" id="visionQuestions"></div>
+          </div>
+
+          <div class="tab-content" data-tab="essentials">
+            <div class="prep-questions-list" id="essentialsQuestions"></div>
+          </div>
+
+          <div class="tab-content" data-tab="firsttest">
+            <div class="prep-questions-list" id="firstTestQuestions"></div>
+          </div>
+
+          <div class="tab-content" data-tab="custom">
+            <div class="prep-questions-list" id="customQuestions"></div>
+            <button class="btn-small btn-add" id="addCustomQuestion">+ Add Custom Question</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Default Storage -->
+    <div class="settings-section">
+      <h2>📂 Default File Storage</h2>
+      <div class="setting-item">
+        <div class="setting-label">Preferred Storage Location</div>
+        <div class="setting-description">Set your default storage. When set, this will be auto-selected during review.</div>
+        
+        <select class="setting-select" id="defaultStorage">
+          <option value="">No default (always ask)</option>
+          <option value="local">Local (Computer)</option>
+          <option value="gdrive">Google Drive</option>
+          <option value="onedrive">Microsoft OneDrive</option>
+          <option value="dropbox">Dropbox</option>
+          <option value="box">Box</option>
+          <option value="amazon">Amazon Drive</option>
+          <option value="mega">Mega</option>
+          <option value="pcloud">pCloud</option>
+          <option value="sync">Sync.com</option>
+          <option value="tresorit">Tresorit</option>
+          <option value="icedrive">Icedrive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Preferred Tools -->
+    <div class="settings-section">
+      <h2>🛠️ Preferred Creation Tools</h2>
+      <div class="setting-item">
+        <div class="setting-label">My Favorite Tools</div>
+        <div class="setting-description">Add your preferred tools. These will appear at the top of the tool list in the Create page.</div>
+        
+        <div class="custom-list" id="preferredToolsList"></div>
+        
+        <button class="btn-small btn-add" id="addPreferredTool">+ Add Tool</button>
+      </div>
     </div>
 
     <!-- Theme & Appearance -->
@@ -217,28 +482,140 @@
         <div class="setting-label">Font Size</div>
         <div class="setting-description">Adjust text size for better readability</div>
         <select class="setting-select" id="fontSize">
-          <option value="small">Small (14px)</option>
-          <option value="medium" selected>Medium (16px - Default)</option>
-          <option value="large">Large (18px)</option>
+          <option value="small">Small</option>
+          <option value="medium" selected>Medium (Default)</option>
+          <option value="large">Large</option>
         </select>
-        <div class="preview-text" id="fontPreview">
-          This is how your text will look. Try different sizes to find what works best for you.
-        </div>
       </div>
 
       <div class="setting-item">
         <div class="setting-label">Layout Density</div>
         <div class="setting-description">Choose between compact or spacious layout</div>
         <select class="setting-select" id="layoutDensity">
-          <option value="compact">Compact - Less padding, more content</option>
+          <option value="compact">Compact</option>
           <option value="normal" selected>Normal (Default)</option>
-          <option value="spacious">Spacious - More breathing room</option>
+          <option value="spacious">Spacious</option>
         </select>
       </div>
     </div>
 
+    <!-- Reminders -->
+    <div class="settings-section">
+      <h2>🔔 Reminder & Cue Customization</h2>
+      
+      <div class="setting-item">
+        <div class="setting-label">Reminder Frequency by Category</div>
+        <div class="setting-description">Set how often you want reminders for each priority level</div>
+        
+        <div class="reminder-grid">
+          <div class="reminder-item">
+            <div class="reminder-item-label">🚀 Act Now</div>
+            <select class="setting-select" data-category="act-now">
+              <option value="none">No reminders</option>
+              <option value="daily" selected>Daily</option>
+              <option value="twice-daily">Twice daily</option>
+              <option value="every-3-hours">Every 3 hours</option>
+            </select>
+          </div>
+          
+          <div class="reminder-item">
+            <div class="reminder-item-label">🌿 Build Momentum</div>
+            <select class="setting-select" data-category="build-momentum">
+              <option value="none">No reminders</option>
+              <option value="daily">Daily</option>
+              <option value="every-2-days" selected>Every 2 days</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+          
+          <div class="reminder-item">
+            <div class="reminder-item-label">⏳ Later, But Worth It</div>
+            <select class="setting-select" data-category="later">
+              <option value="none">No reminders</option>
+              <option value="weekly" selected>Weekly</option>
+              <option value="biweekly">Bi-weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          
+          <div class="reminder-item">
+            <div class="reminder-item-label">📦 Parked Potential</div>
+            <select class="setting-select" data-category="parked">
+              <option value="none" selected>No reminders</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Do Not Disturb Hours</div>
+        <div class="setting-description">Set quiet hours when reminders won't be sent</div>
+        
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 12px;">
+          <div style="flex: 1;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">Start Time</label>
+            <input type="time" class="setting-input" id="dndStart" value="22:00" />
+          </div>
+          <div style="flex: 1;">
+            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px;">End Time</label>
+            <input type="time" class="setting-input" id="dndEnd" value="08:00" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Localization -->
+    <div class="settings-section">
+      <h2>🌍 Localization</h2>
+      
+      <div class="setting-item">
+        <div class="setting-label">Time Zone</div>
+        <div class="setting-description">Set your time zone for accurate reminders</div>
+        <select class="setting-select" id="timezone">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="Pacific/Midway">(GMT-11:00) Midway Island</option>
+          <option value="Pacific/Honolulu">(GMT-10:00) Hawaii</option>
+          <option value="America/Anchorage">(GMT-09:00) Alaska</option>
+          <option value="America/Los_Angeles">(GMT-08:00) Pacific Time</option>
+          <option value="America/Denver">(GMT-07:00) Mountain Time</option>
+          <option value="America/Chicago">(GMT-06:00) Central Time</option>
+          <option value="America/New_York">(GMT-05:00) Eastern Time</option>
+          <option value="Europe/London">(GMT+00:00) London</option>
+          <option value="Europe/Paris">(GMT+01:00) Paris</option>
+          <option value="Europe/Athens">(GMT+02:00) Athens</option>
+          <option value="Asia/Dubai">(GMT+04:00) Dubai</option>
+          <option value="Asia/Manila">(GMT+08:00) Manila</option>
+          <option value="Asia/Tokyo">(GMT+09:00) Tokyo</option>
+          <option value="Australia/Sydney">(GMT+10:00) Sydney</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Data & Privacy -->
+    <div class="settings-section">
+      <h2>🔒 Data & Privacy Controls</h2>
+      
+      <div class="setting-item">
+        <div class="setting-label">Export Your Data</div>
+        <div class="setting-description">Download all your ideas and settings</div>
+        <div class="action-buttons">
+          <button class="btn-small" id="exportCSV">Export as CSV</button>
+          <button class="btn-small" id="exportJSON">Export as JSON</button>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Delete All Data</div>
+        <div class="setting-description">Permanently remove all your ideas and settings</div>
+        <button class="btn-danger" id="deleteAllData">Delete All Data</button>
+      </div>
+    </div>
+
     <div style="text-align: center; margin-top: 40px;">
-      <button class="btn-primary" id="saveSettings">💾 Save Settings</button>
+      <button class="btn-primary" id="saveSettings">💾 Save All Settings</button>
     </div>
   </div>
 
@@ -253,7 +630,10 @@
       getFirestore,
       doc,
       getDoc,
-      setDoc
+      setDoc,
+      collection,
+      getDocs,
+      deleteDoc
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -269,9 +649,36 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const defaultPrepQuestions = {
+      vision: [
+        { id: 'vision-1', title: "Core Statement", prompt: "Write one sentence that captures your idea and why it matters.", enabled: true },
+        { id: 'vision-2', title: "Who is it for?", prompt: "Describe your primary audience.", enabled: true },
+        { id: 'vision-3', title: "Why will they need it?", prompt: "Explain the problem or pain point your idea solves.", enabled: true },
+        { id: 'vision-4', title: "What outcome will it create?", prompt: "State the benefit or transformation users will experience.", enabled: true },
+        { id: 'vision-5', title: "Why does it matter to you?", prompt: "Connect the idea to your personal motivation.", enabled: true }
+      ],
+      essentials: [
+        { id: 'essentials-1', title: "Core Resources", prompt: "List the minimum tools or materials you need to begin.", enabled: true },
+        { id: 'essentials-2', title: "Skills & Knowledge", prompt: "What skills or know-how are essential to move forward?", enabled: true },
+        { id: 'essentials-3', title: "People & Support", prompt: "Do you need collaborators, mentors, or a support network?", enabled: true },
+        { id: 'essentials-4', title: "Time & Space", prompt: "What dedicated time or environment will help you focus?", enabled: true },
+        { id: 'essentials-5', title: "Constraints & Limits", prompt: "What boundaries do you need to respect (budget, tools, compliance)?", enabled: true }
+      ],
+      firsttest: [
+        { id: 'firsttest-1', title: "Minimum Version", prompt: "What's the simplest version of your idea you can create right now?", enabled: true },
+        { id: 'firsttest-2', title: "Core Action", prompt: "What's the first action users can take with it?", enabled: true },
+        { id: 'firsttest-3', title: "Feedback Loop", prompt: "How will you know if it works?", enabled: true },
+        { id: 'firsttest-4', title: "Timeframe (Due Date)", prompt: "How quickly can you build and test this version?", enabled: true },
+        { id: 'firsttest-5', title: "Next Step if Positive", prompt: "If the test shows promise, what's the next logical step?", enabled: true }
+      ],
+      custom: []
+    };
+
+    let prepQuestions = JSON.parse(JSON.stringify(defaultPrepQuestions));
+    let preferredTools = [];
     let currentUser = null;
 
-    // Apply theme on toggle
+    // Apply theme with FIXED approach
     function applyTheme(darkMode) {
       if (darkMode) {
         document.documentElement.classList.remove('light-mode');
@@ -283,66 +690,80 @@
       localStorage.setItem('loop-catcher-dark-mode', darkMode);
     }
 
-    // Apply font size with immediate effect
+    // Apply font size with FIXED approach
     function applyFontSize(size) {
-      // Remove all font classes
       document.documentElement.classList.remove('font-small', 'font-medium', 'font-large');
       document.body.classList.remove('font-small', 'font-medium', 'font-large');
       
-      // Add new font class
       document.documentElement.classList.add(`font-${size}`);
       document.body.classList.add(`font-${size}`);
       
-      // Also set direct font-size
       const multipliers = { small: 0.875, medium: 1, large: 1.125 };
       const baseSize = 16;
       const newSize = baseSize * (multipliers[size] || 1);
       document.documentElement.style.fontSize = `${newSize}px`;
       
       localStorage.setItem('loop-catcher-font-size', size);
-      
       console.log(`✅ Font size set to: ${size} (${newSize}px)`);
     }
 
-    // Apply layout density with immediate effect
+    // Apply layout density with FIXED approach
     function applyLayoutDensity(density) {
-      // Remove all density classes
       document.documentElement.classList.remove('layout-compact', 'layout-spacious');
       document.body.classList.remove('layout-compact', 'layout-spacious');
       
-      // Add new density class
       if (density !== 'normal') {
         document.documentElement.classList.add(`layout-${density}`);
         document.body.classList.add(`layout-${density}`);
       }
       
       localStorage.setItem('loop-catcher-layout-density', density);
-      
       console.log(`✅ Layout density set to: ${density}`);
     }
 
-    // Dark mode toggle
+    function mergeDefaults(defaults, saved) {
+      const merged = [...saved];
+      defaults.forEach(defaultItem => {
+        const exists = saved.some(savedItem => savedItem.id === defaultItem.id);
+        if (!exists) merged.push(defaultItem);
+      });
+      return merged;
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`.tab-content[data-tab="${tab}"]`).classList.add('active');
+      });
+    });
+
+    // Event listeners
     document.getElementById('darkModeToggle').addEventListener('click', (e) => {
       e.target.classList.toggle('active');
       const isDark = e.target.classList.contains('active');
       applyTheme(isDark);
     });
 
-    // Font size selector with live preview
     document.getElementById('fontSize').addEventListener('change', (e) => {
       applyFontSize(e.target.value);
     });
 
-    // Layout density selector
     document.getElementById('layoutDensity').addEventListener('change', (e) => {
       applyLayoutDensity(e.target.value);
     });
 
-    // Load settings from Firebase
-    auth.onAuthStateChanged(async (user) => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
         currentUser = user;
-        await loadSettings();
+        loadSettings();
+      } else {
+        renderPrepQuestions();
       }
     });
 
@@ -354,37 +775,168 @@
         
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
+
+          prepQuestions = {
+            vision: mergeDefaults(defaultPrepQuestions.vision, settings.prepQuestions?.vision || []),
+            essentials: mergeDefaults(defaultPrepQuestions.essentials, settings.prepQuestions?.essentials || []),
+            firsttest: mergeDefaults(defaultPrepQuestions.firsttest, settings.prepQuestions?.firsttest || []),
+            custom: settings.prepQuestions?.custom || []
+          };
+
+          await setDoc(doc(db, 'userSettings', currentUser.uid), { prepQuestions }, { merge: true });
           
-          // Apply dark mode
-          if (settings.darkMode !== undefined) {
-            const toggle = document.getElementById('darkModeToggle');
-            if (settings.darkMode) {
-              toggle.classList.add('active');
-            } else {
-              toggle.classList.remove('active');
-            }
-            applyTheme(settings.darkMode);
-          }
-          
-          // Apply font size
+          if (settings.preferredTools) preferredTools = settings.preferredTools;
+          if (settings.defaultStorage) document.getElementById('defaultStorage').value = settings.defaultStorage;
           if (settings.fontSize) {
             document.getElementById('fontSize').value = settings.fontSize;
             applyFontSize(settings.fontSize);
           }
-          
-          // Apply layout density
           if (settings.layoutDensity) {
             document.getElementById('layoutDensity').value = settings.layoutDensity;
             applyLayoutDensity(settings.layoutDensity);
           }
+          if (settings.timezone) document.getElementById('timezone').value = settings.timezone;
+          if (settings.dndStart) document.getElementById('dndStart').value = settings.dndStart;
+          if (settings.dndEnd) document.getElementById('dndEnd').value = settings.dndEnd;
+          if (settings.darkMode !== undefined) {
+            const toggle = document.getElementById('darkModeToggle');
+            if (settings.darkMode) toggle.classList.add('active');
+            else toggle.classList.remove('active');
+            applyTheme(settings.darkMode);
+          }
+
+          if (settings.reminders) {
+            if (settings.reminders.actNow) document.querySelector('[data-category="act-now"]').value = settings.reminders.actNow;
+            if (settings.reminders.buildMomentum) document.querySelector('[data-category="build-momentum"]').value = settings.reminders.buildMomentum;
+            if (settings.reminders.later) document.querySelector('[data-category="later"]').value = settings.reminders.later;
+            if (settings.reminders.parked) document.querySelector('[data-category="parked"]').value = settings.reminders.parked;
+          }
         }
+        
+        renderPrepQuestions();
+        renderPreferredTools();
         
       } catch (err) {
         console.error('Error loading settings:', err);
+        renderPrepQuestions();
       }
     }
 
-    // Save settings
+    function renderPrepQuestions() {
+      renderSectionQuestions('vision', 'visionQuestions');
+      renderSectionQuestions('essentials', 'essentialsQuestions');
+      renderSectionQuestions('firsttest', 'firstTestQuestions');
+      renderSectionQuestions('custom', 'customQuestions');
+    }
+
+    function renderSectionQuestions(section, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      
+      const questions = (prepQuestions[section] || []).map(q => ({
+        enabled: q.enabled !== false,
+        ...q
+      }));
+      
+      if (questions.length === 0 && section !== 'custom') {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No questions in this section.</p>';
+        return;
+      }
+      
+      if (questions.length === 0 && section === 'custom') {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">No custom questions yet. Click the button below to add one.</p>';
+        return;
+      }
+      
+      questions.forEach((q, index) => {
+        const item = document.createElement('div');
+        item.className = 'prep-question-item';
+        if (!q.enabled) item.classList.add('disabled');
+        
+        item.innerHTML = `
+          <div class="prep-question-header">
+            <span class="prep-question-number">${index + 1}.</span>
+            <div class="prep-question-content">
+              <div class="prep-question-title">${q.title}</div>
+              <div class="prep-question-prompt">${q.prompt}</div>
+            </div>
+            <div class="toggle-switch toggle-switch-small ${q.enabled ? 'active' : ''}" data-section="${section}" data-index="${index}"></div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      
+      container.querySelectorAll('.toggle-switch').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+          const section = e.target.dataset.section;
+          const index = parseInt(e.target.dataset.index);
+          prepQuestions[section][index].enabled = !prepQuestions[section][index].enabled;
+          renderPrepQuestions();
+        });
+      });
+    }
+
+    document.getElementById('addCustomQuestion').addEventListener('click', () => {
+      const title = prompt('Enter question title:');
+      if (!title) return;
+      
+      const prompt_text = prompt('Enter question prompt:');
+      if (!prompt_text) return;
+      
+      prepQuestions.custom.push({
+        id: 'custom-' + Date.now(),
+        title: title,
+        prompt: prompt_text,
+        enabled: true
+      });
+      renderPrepQuestions();
+      document.querySelector('.tab-btn[data-tab="custom"]').click();
+    });
+
+    function renderPreferredTools() {
+      const list = document.getElementById('preferredToolsList');
+      list.innerHTML = '';
+      
+      if (preferredTools.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">No preferred tools yet. Click the button below to add one.</p>';
+        return;
+      }
+      
+      preferredTools.forEach((tool, index) => {
+        const item = document.createElement('div');
+        item.className = 'custom-list-item';
+        item.innerHTML = `
+          <input type="text" class="setting-input" value="${tool.name || ''}" data-index="${index}" data-field="name" placeholder="Tool name" />
+          <input type="text" class="setting-input" value="${tool.url || ''}" data-index="${index}" data-field="url" placeholder="https://example.com" />
+          <button class="btn-small btn-remove" data-index="${index}">Remove</button>
+        `;
+        list.appendChild(item);
+      });
+      
+      list.querySelectorAll('input[data-index]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          preferredTools[index][field] = e.target.value;
+        });
+      });
+
+      list.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          if (confirm('Remove this tool?')) {
+            preferredTools.splice(index, 1);
+            renderPreferredTools();
+          }
+        });
+      });
+    }
+
+    document.getElementById('addPreferredTool').addEventListener('click', () => {
+      preferredTools.push({ name: '', url: '' });
+      renderPreferredTools();
+    });
+
     document.getElementById('saveSettings').addEventListener('click', async () => {
       if (!currentUser) {
         alert('Please log in to save settings');
@@ -392,13 +944,25 @@
       }
 
       const settings = {
-        darkMode: document.getElementById('darkModeToggle').classList.contains('active'),
+        prepQuestions,
+        preferredTools,
+        defaultStorage: document.getElementById('defaultStorage').value,
         fontSize: document.getElementById('fontSize').value,
-        layoutDensity: document.getElementById('layoutDensity').value
+        layoutDensity: document.getElementById('layoutDensity').value,
+        timezone: document.getElementById('timezone').value,
+        dndStart: document.getElementById('dndStart').value,
+        dndEnd: document.getElementById('dndEnd').value,
+        darkMode: document.getElementById('darkModeToggle').classList.contains('active'),
+        reminders: {
+          actNow: document.querySelector('[data-category="act-now"]').value,
+          buildMomentum: document.querySelector('[data-category="build-momentum"]').value,
+          later: document.querySelector('[data-category="later"]').value,
+          parked: document.querySelector('[data-category="parked"]').value
+        }
       };
 
       try {
-        await setDoc(doc(db, 'userSettings', currentUser.uid), settings, { merge: true });
+        await setDoc(doc(db, 'userSettings', currentUser.uid), settings);
         
         const notification = document.getElementById('saveNotification');
         notification.classList.add('show');
@@ -411,6 +975,93 @@
       } catch (err) {
         console.error('Error saving settings:', err);
         alert('Error saving settings: ' + err.message);
+      }
+    });
+
+    document.getElementById('exportCSV').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to export data');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const items = itemsSnapshot.docs.map(d => d.data());
+        
+        let csv = 'Term,Output,Cue,Goal,Priority,Status,Date Added\n';
+        items.forEach(item => {
+          const dateAdded = item.dateAdded?.toDate?.() ? item.dateAdded.toDate().toISOString() : '';
+          csv += `"${item.term || ''}","${item.output || ''}","${item.cue || ''}","${item.goal || ''}","${item.priority || ''}","${item.status || ''}","${dateAdded}"\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `loop-catcher-export-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Error exporting data: ' + err.message);
+      }
+    });
+
+    document.getElementById('exportJSON').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to export data');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const items = itemsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        const exportData = {
+          exportDate: new Date().toISOString(),
+          itemCount: items.length,
+          items
+        };
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `loop-catcher-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+      } catch (err) {
+        console.error('Export error:', err);
+        alert('Error exporting data: ' + err.message);
+      }
+    });
+
+    document.getElementById('deleteAllData').addEventListener('click', async () => {
+      if (!currentUser) {
+        alert('Please log in to delete data');
+        return;
+      }
+
+      const confirmed = confirm('⚠️ WARNING: This will permanently delete ALL your ideas and cannot be undone. Are you absolutely sure?');
+      if (!confirmed) return;
+
+      const doubleConfirm = prompt('Type "DELETE ALL" to confirm:');
+      if (doubleConfirm !== 'DELETE ALL') {
+        alert('Deletion cancelled');
+        return;
+      }
+
+      try {
+        const itemsSnapshot = await getDocs(collection(db, 'items'));
+        const deletePromises = itemsSnapshot.docs.map(d => deleteDoc(doc(db, 'items', d.id)));
+        await Promise.all(deletePromises);
+        
+        alert('✅ All data has been deleted');
+        window.location.href = 'app.html';
+        
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Error deleting data: ' + err.message);
       }
     });
   </script>
