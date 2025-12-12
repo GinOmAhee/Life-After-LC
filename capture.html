@@ -675,6 +675,35 @@
       const toolsList = document.getElementById('toolsList');
       toolsList.innerHTML = '';
 
+      // First, render preferred tools if user has them
+      if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
+        const preferredCategory = document.createElement('div');
+        preferredCategory.className = 'tool-category';
+        preferredCategory.dataset.category = 'preferred';
+        
+        preferredCategory.innerHTML = `
+          <h3>⭐ My Preferred Tools</h3>
+          <div class="tool-list">
+            ${userSettings.preferredTools.map(tool => {
+              if (!tool.name || !tool.url) return '';
+              const cleanUrl = tool.url.replace(/^https?:\/\//, '');
+              return `
+                <a href="${tool.url.startsWith('http') ? tool.url : 'https://' + tool.url}" target="_blank" class="tool-item" data-tool-name="${tool.name.toLowerCase()}">
+                  <span class="tool-emoji">⭐</span>
+                  <div class="tool-text">
+                    <span class="tool-name">${tool.name}</span>
+                    <span class="tool-url">${cleanUrl}</span>
+                  </div>
+                </a>
+              `;
+            }).join('')}
+          </div>
+        `;
+        
+        toolsList.appendChild(preferredCategory);
+      }
+
+      // Then render suggested/all categories
       categories.forEach(category => {
         const categoryDiv = document.createElement('div');
         categoryDiv.className = 'tool-category';
@@ -741,45 +770,69 @@
     const closeModalBtn = document.getElementById('closeModalBtn');
 
     reviewOutputBtn.addEventListener('click', () => {
-      fileLocationModal.classList.remove('hidden');
+      // If user has default storage, go directly there
+      if (userSettings?.defaultStorage && userSettings.defaultStorage !== '') {
+        handleStorageSelection(userSettings.defaultStorage);
+      } else {
+        // Otherwise show modal
+        fileLocationModal.classList.remove('hidden');
+      }
     });
 
     closeModalBtn.addEventListener('click', () => {
       fileLocationModal.classList.add('hidden');
     });
 
+    // Storage URL map
+    const storageUrls = {
+      'gdrive': 'https://drive.google.com',
+      'onedrive': 'https://onedrive.live.com',
+      'dropbox': 'https://www.dropbox.com',
+      'box': 'https://www.box.com',
+      'amazon': 'https://www.amazon.com/photos',
+      'mega': 'https://mega.io',
+      'pcloud': 'https://www.pcloud.com',
+      'sync': 'https://www.sync.com',
+      'tresorit': 'https://tresorit.com',
+      'icedrive': 'https://icedrive.net'
+    };
+
+    async function handleStorageSelection(type) {
+      // Mark stages as complete silently
+      if (ideaId && db) {
+        try {
+          await updateDoc(doc(db, 'items', ideaId), {
+            createCompleted: true,
+            createCompletedAt: serverTimestamp(),
+            reviewCompleted: true,
+            reviewCompletedAt: serverTimestamp(),
+            fileLocation: type
+          });
+          console.log('✅ Progress updated');
+        } catch (err) {
+          console.error('Error updating progress:', err);
+        }
+      }
+
+      // Close modal
+      fileLocationModal.classList.add('hidden');
+
+      // Handle local or open URL
+      if (type === 'local') {
+        setTimeout(() => {
+          alert('💡 Tip: Open your file explorer to access your local files');
+        }, 300);
+      } else if (storageUrls[type]) {
+        window.open(storageUrls[type], '_blank');
+      }
+    }
+
     // Handle location option clicks
     document.querySelectorAll('.location-option').forEach(option => {
       option.addEventListener('click', async (e) => {
+        e.preventDefault();
         const type = option.dataset.type;
-        
-        // Mark stages as complete silently
-        if (ideaId && db) {
-          try {
-            await updateDoc(doc(db, 'items', ideaId), {
-              createCompleted: true,
-              createCompletedAt: serverTimestamp(),
-              reviewCompleted: true,
-              reviewCompletedAt: serverTimestamp(),
-              fileLocation: type
-            });
-            console.log('✅ Progress updated');
-          } catch (err) {
-            console.error('Error updating progress:', err);
-          }
-        }
-
-        // Close modal immediately
-        fileLocationModal.classList.add('hidden');
-
-        // For local option, show tip
-        if (type === 'local') {
-          e.preventDefault();
-          setTimeout(() => {
-            alert('💡 Tip: Open your file explorer to access your local files');
-          }, 300);
-        }
-        // For other options, the link will open naturally in new tab
+        handleStorageSelection(type);
       });
     });
 
