@@ -888,8 +888,27 @@
       });
     });
 
+    async function loadUserSettingsSafely() {
+      try {
+        const stored = localStorage.getItem("userSettings");
+        return stored ? JSON.parse(stored) : {};
+      } catch (err) {
+        console.error("Error loading user settings:", err);
+        return {};
+      }
+    }
+
     // Load tools on page load
-    loadAndSuggestTools();
+    document.addEventListener("DOMContentLoaded", async () => {
+      console.log("✅ DOM loaded");
+
+      // ✅ Load user settings first (from Firestore or localStorage)
+      userSettings = await loadUserSettingsSafely();
+      console.log("✅ User settings loaded:", userSettings);
+
+      // ✅ Then load tool suggestions
+      await loadAndSuggestTools();
+    });
   </script>
 </body>
 </html>
