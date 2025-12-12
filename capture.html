@@ -654,45 +654,57 @@
 
       try {
         const ideaDoc = await getDoc(doc(db, 'items', ideaId));
-        
+    
         if (!ideaDoc.exists()) {
           document.getElementById('noSuggestions').classList.remove('hidden');
           return;
         }
 
         const ideaData = ideaDoc.data();
-        const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || '';
+        const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || "";
+        const prepSkipped = ideaData.prepSkipped === true;
 
-        // ✅ If user skipped prep → show ALL tools
-        if (minVersion === "__skipped__") {
+        // ✅ CASE 1: Preferred tools override everything
+        if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
           document.getElementById('noSuggestions').classList.add('hidden');
-          renderTools([]); // show all tools
+          renderTools([{ title: "Preferred", tools: userSettings.preferredTools, emoji: "⭐" }]);
           return;
         }
 
-        // ✅ If Minimum Version is empty → show NO suggestions
+        // ✅ CASE 3: User skipped prep → show ALL tools
+        if (prepSkipped || minVersion === "__skipped__") {
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // all tools
+          return;
+        }
+
+        // ✅ CASE 2: Prep answered but Minimum Version empty → show NO suggestions
         if (!minVersion || minVersion.trim() === "") {
           const msg = document.getElementById('noSuggestions');
-          msg.innerHTML = `<p>Please state the Minimum Version you want to accomplish to get tool suggestions.</p>`;
+          msg.innerHTML = `
+            <p>Tell us the Minimum Version you can accomplish to see suggested tools, or view all tools.</p>
+          `;
           msg.classList.remove('hidden');
           return;
         }
 
-        // Detect matching categories
+        // ✅ Detect matching categories
+        matchedCategories = [];
         for (const [key, category] of Object.entries(toolCategories)) {
-          const hasMatch = category.keywords.some(keyword => minVersion.includes(keyword.toLowerCase()));
-          if (hasMatch) {
-            matchedCategories.push(category);
-          }
+          const hasMatch = category.keywords.some(keyword =>
+            minVersion.includes(keyword.toLowerCase())
+          );
+          if (hasMatch) matchedCategories.push(category);
         }
 
-        // ✅ If user answered Minimum Version but no categories matched → show ALL tools
+        // ✅ If Minimum Version provided but no matches → show ALL tools
         if (matchedCategories.length === 0) {
           document.getElementById('noSuggestions').classList.add('hidden');
-          renderTools([]); // show ALL tools
+          renderTools([]); // all tools
           return;
         }
 
+        // ✅ Otherwise show suggested categories
         renderTools(matchedCategories);
 
       } catch (err) {
