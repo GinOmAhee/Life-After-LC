@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Create - Loop Catcher</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="global-settings.js"></script>
   <style>
     .create-container {
       max-width: 1000px;
@@ -309,6 +308,7 @@
       color: var(--accent);
     }
   </style>
+  <script src="global-settings.js"></script>
 </head>
 <body>
   <div class="create-container">
@@ -331,7 +331,7 @@
 
     <div class="tools-section" id="toolsSection">
       <h2>🛠️ Suggested Tools</h2>
-      <p class="subtitle" id="toolsSubtitle">Based on your prep answers, here are some tools that might help:</p>
+      <p class="subtitle">Based on your prep answers, here are some tools that might help:</p>
       
       <div class="tools-controls">
         <input type="text" class="search-box" id="toolSearch" placeholder="Search for a tool..." />
@@ -503,7 +503,7 @@
       }
     }
 
-    // All tool categories with keywords
+    // All tool categories
     const toolCategories = {
       writing: {
         keywords: ['write', 'draft', 'compose', 'outline', 'summarize', 'clarify', 'edit', 'document', 'note', 'list', 'jot', 'quick draft', 'practice writing'],
@@ -630,6 +630,22 @@
     let matchedCategories = [];
     let skippedPrep = false;
 
+    async function skipPrep() {
+      try {
+        await updateDoc(doc(db, 'items', ideaId), {
+          prepSkipped: true,
+          firstTest: {
+            minVersion: "__skipped__"
+          }
+        });
+
+        window.location.href = `create.html?id=${ideaId}`;
+      } catch (err) {
+        console.error("Error saving skip state:", err);
+        alert("Could not skip prep. Please try again.");
+      }
+    }
+
     async function loadAndSuggestTools() {
       if (!ideaId || !db) {
         document.getElementById('noSuggestions').classList.remove('hidden');
@@ -645,53 +661,38 @@
         }
 
         const ideaData = ideaDoc.data();
-        
-        // ✅ FIXED: Check if prep was skipped
-        if (ideaData.prepSkipped === true) {
-          skippedPrep = true;
-          console.log('📋 Prep was skipped - showing all tools');
-          document.getElementById('toolsSubtitle').textContent = 
-            'You skipped prep, so here are all available tools to help you create';
-          document.getElementById('noSuggestions').classList.add('hidden');
-          renderTools([]); // Show all tools
-          return;
-        }
-
         const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || '';
 
-        // ✅ If Minimum Version is empty → show all tools
-        if (!minVersion || minVersion.trim() === "") {
-          console.log('📋 No minimum version - showing all tools');
-          document.getElementById('toolsSubtitle').textContent = 
-            'Browse all available tools to help you create';
+        // ✅ If user skipped prep → show ALL tools
+        if (minVersion === "__skipped__") {
           document.getElementById('noSuggestions').classList.add('hidden');
-          renderTools([]); // Show all tools
+          renderTools([]); // show all tools
           return;
         }
 
-        // Detect matching categories based on keywords
+        // ✅ If Minimum Version is empty → show NO suggestions
+        if (!minVersion || minVersion.trim() === "") {
+          const msg = document.getElementById('noSuggestions');
+          msg.innerHTML = `<p>Please state the Minimum Version you want to accomplish to get tool suggestions.</p>`;
+          msg.classList.remove('hidden');
+          return;
+        }
+
+        // Detect matching categories
         for (const [key, category] of Object.entries(toolCategories)) {
-          const hasMatch = category.keywords.some(keyword => 
-            minVersion.includes(keyword.toLowerCase())
-          );
+          const hasMatch = category.keywords.some(keyword => minVersion.includes(keyword.toLowerCase()));
           if (hasMatch) {
             matchedCategories.push(category);
           }
         }
 
-        // ✅ If no categories matched → show all tools
+        // ✅ If user answered Minimum Version but no categories matched → show ALL tools
         if (matchedCategories.length === 0) {
-          console.log('📋 No keyword matches - showing all tools');
-          document.getElementById('toolsSubtitle').textContent = 
-            'Browse all available tools to help you create';
           document.getElementById('noSuggestions').classList.add('hidden');
-          renderTools([]); // Show all tools
+          renderTools([]); // show ALL tools
           return;
         }
 
-        // Show matched categories
-        console.log(`📋 Found ${matchedCategories.length} matching categories`);
-        document.getElementById('noSuggestions').classList.add('hidden');
         renderTools(matchedCategories);
 
       } catch (err) {
@@ -705,9 +706,14 @@
       toolsList.innerHTML = '';
 
       // ✅ If categories is empty → show ALL tools
-      const categoriesToShow = categories.length === 0 
-        ? Object.values(toolCategories) 
-        : categories;
+      if (!categories || categories.length === 0) {
+        document.getElementById('noSuggestions').classList.add('hidden');
+        renderAllTools();
+        return;
+      }
+
+      // ✅ Hide "no suggestions" because we have categories
+      document.getElementById('noSuggestions').classList.add('hidden');
 
       // First, render preferred tools if user has them
       if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
@@ -738,7 +744,7 @@
       }
 
       // Then render suggested/all categories
-      categoriesToShow.forEach(category => {
+      categories.forEach(category => {
         const categoryDiv = document.createElement('div');
         categoryDiv.className = 'tool-category';
         categoryDiv.dataset.category = category.title.toLowerCase();
