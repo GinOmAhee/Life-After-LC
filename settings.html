@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Settings - Loop Catcher</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="global-settings.js"></script>
   <style>
     .settings-container {
       max-width: 900px;
@@ -379,6 +378,48 @@
         opacity: 1;
       }
     }
+
+    body.light-mode {
+      --bg: #ffffff;
+      --bg-elevated: #f8f9fa;
+      --border: rgba(0,0,0,0.1);
+      --text: #1a1a1a;
+      --text-muted: #6b7280;
+      --accent: #0ea5e9;
+      --accent-glow: rgba(14,165,233,0.15);
+    }
+
+    /* Font size classes */
+    body.font-small {
+      font-size: 14px;
+    }
+
+    body.font-medium {
+      font-size: 16px;
+    }
+
+    body.font-large {
+      font-size: 18px;
+    }
+
+    /* Layout density classes */
+    body.layout-compact .settings-section {
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    body.layout-compact .setting-item {
+      padding: 12px 0;
+    }
+
+    body.layout-spacious .settings-section {
+      padding: 32px;
+      margin-bottom: 28px;
+    }
+
+    body.layout-spacious .setting-item {
+      padding: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -678,59 +719,82 @@
     let preferredTools = [];
     let currentUser = null;
 
-    // Apply theme with FIXED approach
+    // Apply saved theme/font/layout on page load
+    (function() {
+      const savedDarkMode = localStorage.getItem('loop-catcher-dark-mode');
+      const savedFontSize = localStorage.getItem('loop-catcher-font-size');
+      const savedLayoutDensity = localStorage.getItem('loop-catcher-layout-density');
+
+      if (savedDarkMode !== null) {
+        applyTheme(savedDarkMode === 'true');
+      }
+      if (savedFontSize) {
+        applyFontSize(savedFontSize);
+      }
+      if (savedLayoutDensity) {
+        applyLayoutDensity(savedLayoutDensity);
+      }
+    })();
+
     function applyTheme(darkMode) {
       if (darkMode) {
-        document.documentElement.classList.remove('light-mode');
         document.body.classList.remove('light-mode');
       } else {
-        document.documentElement.classList.add('light-mode');
         document.body.classList.add('light-mode');
       }
       localStorage.setItem('loop-catcher-dark-mode', darkMode);
     }
 
-    // Apply font size with FIXED approach
     function applyFontSize(size) {
-      document.documentElement.classList.remove('font-small', 'font-medium', 'font-large');
-      document.body.classList.remove('font-small', 'font-medium', 'font-large');
-      
-      document.documentElement.classList.add(`font-${size}`);
-      document.body.classList.add(`font-${size}`);
-      
-      const multipliers = { small: 0.875, medium: 1, large: 1.125 };
-      const baseSize = 16;
-      const newSize = baseSize * (multipliers[size] || 1);
-      document.documentElement.style.fontSize = `${newSize}px`;
-      
-      localStorage.setItem('loop-catcher-font-size', size);
-      console.log(`✅ Font size set to: ${size} (${newSize}px)`);
+      const multipliers = { small: 0.9, medium: 1, large: 1.1 };
+      document.documentElement.style.fontSize = `${16 * (multipliers[size] || 1)}px`;
     }
 
-    // Apply layout density with FIXED approach
     function applyLayoutDensity(density) {
-      document.documentElement.classList.remove('layout-compact', 'layout-spacious');
-      document.body.classList.remove('layout-compact', 'layout-spacious');
-      
+      const body = document.body;
+      body.classList.remove('compact', 'spacious');
       if (density !== 'normal') {
-        document.documentElement.classList.add(`layout-${density}`);
-        document.body.classList.add(`layout-${density}`);
+        body.classList.add(density);
       }
-      
-      localStorage.setItem('loop-catcher-layout-density', density);
-      console.log(`✅ Layout density set to: ${density}`);
+    }
+
+    function normalizePrepQuestions(prep) {
+      // If it's already in the new structure, return as-is
+      if (prep.vision && prep.essentials && prep.firsttest) {
+        return prep;
+      }
+
+      // Otherwise convert old flat structure
+      const grouped = {
+        vision: [],
+        essentials: [],
+        firsttest: [],
+        custom: []
+      };
+
+      Object.values(prep).forEach(item => {
+        if (!item.id) return;
+
+        if (item.id.startsWith("vision-")) grouped.vision.push(item);
+        else if (item.id.startsWith("essentials-")) grouped.essentials.push(item);
+        else if (item.id.startsWith("firsttest-")) grouped.firsttest.push(item);
+        else grouped.custom.push(item);
+      });
+
+      return grouped;
     }
 
     function mergeDefaults(defaults, saved) {
       const merged = [...saved];
+
       defaults.forEach(defaultItem => {
         const exists = saved.some(savedItem => savedItem.id === defaultItem.id);
         if (!exists) merged.push(defaultItem);
       });
-      return merged;
-    }
 
-    // Tab switching
+      return merged;
+    }  
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
@@ -743,7 +807,6 @@
       });
     });
 
-    // Event listeners
     document.getElementById('darkModeToggle').addEventListener('click', (e) => {
       e.target.classList.toggle('active');
       const isDark = e.target.classList.contains('active');
@@ -763,6 +826,7 @@
         currentUser = user;
         loadSettings();
       } else {
+        console.log('No user logged in');
         renderPrepQuestions();
       }
     });
@@ -776,6 +840,7 @@
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
 
+          // Merge defaults with saved settings
           prepQuestions = {
             vision: mergeDefaults(defaultPrepQuestions.vision, settings.prepQuestions?.vision || []),
             essentials: mergeDefaults(defaultPrepQuestions.essentials, settings.prepQuestions?.essentials || []),
@@ -783,33 +848,66 @@
             custom: settings.prepQuestions?.custom || []
           };
 
-          await setDoc(doc(db, 'userSettings', currentUser.uid), { prepQuestions }, { merge: true });
+          // ✅ Write merged version back to Firebase
+          await setDoc(
+            doc(db, 'userSettings', currentUser.uid),
+            { prepQuestions },
+            { merge: true }
+          );
           
-          if (settings.preferredTools) preferredTools = settings.preferredTools;
-          if (settings.defaultStorage) document.getElementById('defaultStorage').value = settings.defaultStorage;
+          if (settings.preferredTools) {
+            preferredTools = settings.preferredTools;
+          }
+          
+          if (settings.defaultStorage) {
+            document.getElementById('defaultStorage').value = settings.defaultStorage;
+          }
+          
           if (settings.fontSize) {
             document.getElementById('fontSize').value = settings.fontSize;
             applyFontSize(settings.fontSize);
           }
+          
           if (settings.layoutDensity) {
             document.getElementById('layoutDensity').value = settings.layoutDensity;
             applyLayoutDensity(settings.layoutDensity);
           }
-          if (settings.timezone) document.getElementById('timezone').value = settings.timezone;
-          if (settings.dndStart) document.getElementById('dndStart').value = settings.dndStart;
-          if (settings.dndEnd) document.getElementById('dndEnd').value = settings.dndEnd;
+          
+          if (settings.timezone) {
+            document.getElementById('timezone').value = settings.timezone;
+          }
+          
+          if (settings.dndStart) {
+            document.getElementById('dndStart').value = settings.dndStart;
+          }
+          
+          if (settings.dndEnd) {
+            document.getElementById('dndEnd').value = settings.dndEnd;
+          }
+          
           if (settings.darkMode !== undefined) {
             const toggle = document.getElementById('darkModeToggle');
-            if (settings.darkMode) toggle.classList.add('active');
-            else toggle.classList.remove('active');
+            if (settings.darkMode) {
+              toggle.classList.add('active');
+            } else {
+              toggle.classList.remove('active');
+            }
             applyTheme(settings.darkMode);
           }
 
           if (settings.reminders) {
-            if (settings.reminders.actNow) document.querySelector('[data-category="act-now"]').value = settings.reminders.actNow;
-            if (settings.reminders.buildMomentum) document.querySelector('[data-category="build-momentum"]').value = settings.reminders.buildMomentum;
-            if (settings.reminders.later) document.querySelector('[data-category="later"]').value = settings.reminders.later;
-            if (settings.reminders.parked) document.querySelector('[data-category="parked"]').value = settings.reminders.parked;
+            if (settings.reminders.actNow) {
+              document.querySelector('[data-category="act-now"]').value = settings.reminders.actNow;
+            }
+            if (settings.reminders.buildMomentum) {
+              document.querySelector('[data-category="build-momentum"]').value = settings.reminders.buildMomentum;
+            }
+            if (settings.reminders.later) {
+              document.querySelector('[data-category="later"]').value = settings.reminders.later;
+            }
+            if (settings.reminders.parked) {
+              document.querySelector('[data-category="parked"]').value = settings.reminders.parked;
+            }
           }
         }
         
@@ -851,7 +949,9 @@
       questions.forEach((q, index) => {
         const item = document.createElement('div');
         item.className = 'prep-question-item';
-        if (!q.enabled) item.classList.add('disabled');
+        if (!q.enabled) {
+          item.classList.add('disabled');
+        }
         
         item.innerHTML = `
           <div class="prep-question-header">
