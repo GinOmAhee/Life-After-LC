@@ -373,89 +373,7 @@ function renderAllTools() {
   });
 }
 
-// Handle storage selection
-async function handleStorageSelection(type, buttonType) {
-  if (ideaId && db) {
-    try {
-      const updateData = {};
-      
-      // Mark create as completed for both resume and review
-      updateData.createCompleted = true;
-      updateData.createCompletedAt = serverTimestamp();
-      
-      // Only mark review as completed if review button was clicked
-      if (buttonType === 'review') {
-        updateData.reviewCompleted = true;
-        updateData.reviewCompletedAt = serverTimestamp();
-      }
-      
-      updateData.fileLocation = type;
-      
-      await updateDoc(doc(db, 'items', ideaId), updateData);
-      console.log('✅ Progress updated');
-    } catch (err) {
-      console.error('Error updating progress:', err);
-    }
-  }
 
-  // Close modal
-  document.getElementById('fileLocationModal').classList.add('hidden');
-
-  // Handle local or open URL
-  if (type === 'local') {
-    setTimeout(() => {
-      alert('💡 Tip: Open your file explorer to access your local files');
-    }, 300);
-  } else if (storageUrls[type]) {
-    window.open(storageUrls[type], '_blank');
-  }
-  
-  // Update button states after action
-  if (buttonType === 'resume') {
-    updateButtonState('resumeCreationBtn', true);
-  } else if (buttonType === 'review') {
-    updateButtonState('resumeCreationBtn', true); // Disable resume after review
-    updateButtonState('reviewBtn', true);
-  }
-}
-
-// Update button state
-function updateButtonState(buttonId, completed) {
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.dataset.completed = completed;
-    if (completed) {
-      button.disabled = true;
-    }
-  }
-}
-
-// Load button states from Firebase
-async function loadButtonStates() {
-  if (!ideaId || !db) return;
-  
-  try {
-    const ideaDoc = await getDoc(doc(db, 'items', ideaId));
-    if (ideaDoc.exists()) {
-      const ideaData = ideaDoc.data();
-      
-      // Resume Creation button - completed if createCompleted is true
-      if (ideaData.createCompleted) {
-        updateButtonState('resumeCreationBtn', true);
-      }
-      
-      // Review button - completed if reviewCompleted is true
-      if (ideaData.reviewCompleted) {
-        updateButtonState('resumeCreationBtn', true);
-        updateButtonState('reviewBtn', true);
-      }
-      
-      // Tests button - no auto-completion state for now
-    }
-  } catch (err) {
-    console.error('Error loading button states:', err);
-  }
-}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
@@ -472,44 +390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentUser = user;
       await loadUserSettings();
       await loadAndSuggestTools();
-      await loadButtonStates();
     }
-  });
-  
-  // Resume Creation button
-  let currentButtonType = null;
-  
-  document.getElementById('resumeCreationBtn').addEventListener('click', () => {
-    if (document.getElementById('resumeCreationBtn').dataset.completed === 'true') return;
-    
-    currentButtonType = 'resume';
-    if (userSettings?.defaultStorage && userSettings.defaultStorage !== '') {
-      handleStorageSelection(userSettings.defaultStorage, 'resume');
-    } else {
-      document.getElementById('fileLocationModal').classList.remove('hidden');
-    }
-  });
-  
-  // Review button
-  document.getElementById('reviewBtn').addEventListener('click', () => {
-    if (document.getElementById('reviewBtn').dataset.completed === 'true') return;
-    
-    currentButtonType = 'review';
-    if (userSettings?.defaultStorage && userSettings.defaultStorage !== '') {
-      handleStorageSelection(userSettings.defaultStorage, 'review');
-    } else {
-      document.getElementById('fileLocationModal').classList.remove('hidden');
-    }
-  });
-  
-  // Tests button
-  document.getElementById('testsBtn').addEventListener('click', () => {
-    if (!ideaId) {
-      alert('No idea ID found');
-      return;
-    }
-    // Navigate to test.html page
-    window.location.href = `test.html?id=${ideaId}&title=${encodeURIComponent(ideaTitle || '')}`;
   });
   
   // View All Tools button
@@ -553,18 +434,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   
   // Close modal button
-  document.getElementById('closeModalBtn').addEventListener('click', () => {
-    document.getElementById('fileLocationModal').classList.add('hidden');
-  });
-  
-  // Handle location option clicks
-  document.querySelectorAll('.location-option').forEach(option => {
-    option.addEventListener('click', (e) => {
-      e.preventDefault();
-      const type = option.dataset.type;
-      handleStorageSelection(type, currentButtonType);
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      const modal = document.getElementById('fileLocationModal');
+      if (modal) modal.classList.add('hidden');
     });
-  });
+  }
   
   console.log('✅ Capture page initialized');
 });
