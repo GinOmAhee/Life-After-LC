@@ -599,7 +599,6 @@ function renderView(view = currentView, items = []) {
       </div>
       <div class="actions">
         ${!it.launchCompleted ? `<button class="small get-started" data-id="${it.id}" data-term="${escapeHtml(it.term)}">Get Started</button>` : ''}
-        ${it.reviewCompleted && !it.launchCompleted ? `<button class="small launch-btn" data-id="${it.id}" data-term="${escapeHtml(it.term)}">Launch</button>` : ''}
         ${it.launchCompleted ? `<span class="status-badge">✅ Launched</span>` : ''}
         <button class="small edit" data-id="${it.id}">Edit</button>
         <button class="small delete" data-id="${it.id}">Delete</button>
@@ -633,6 +632,11 @@ function renderView(view = currentView, items = []) {
           window.location.href = `prep.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
         };
       }
+    }
+
+    const launchBtn = card.querySelector('.launch-btn');
+    if (launchBtn) {
+      launchBtn.onclick = () => openLaunchModal(it.id, it.term);
     }
 
     const launchBtn = card.querySelector('.launch-btn');
