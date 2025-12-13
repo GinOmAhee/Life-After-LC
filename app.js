@@ -754,11 +754,6 @@ function renderView(view = currentView, items = []) {
       launchBtn.onclick = () => openLaunchModal(it.id, it.term);
     }
 
-    const launchBtn = card.querySelector('.launch-btn');
-    if (launchBtn) {
-      launchBtn.onclick = () => openLaunchModal(it.id, it.term);
-    }
-
     // Resume Creation button
     const resumeBtn = card.querySelector('.resume-creation-btn');
     if (resumeBtn) {
@@ -1012,4 +1007,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('✅ App initialized');
 });
+
 
