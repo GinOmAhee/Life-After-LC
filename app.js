@@ -277,11 +277,6 @@ async function handleStorageSelection(ideaId, storageType, buttonType) {
   }
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
-}
-
 function clearRow(row) {
   row.querySelector('.term-input').value = '';
   row.querySelector('.output-select').value = '';
@@ -1017,3 +1012,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('✅ App initialized');
 });
+
