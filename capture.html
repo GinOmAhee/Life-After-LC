@@ -1,46 +1,870 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    getDoc,
-    updateDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create - Loop Catcher</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="global-settings.js"></script>
+  <style>
+    .create-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAQNThNeCaMD7Z8O8mhCGsYyXbg2X8bpms",
-    authDomain: "life-after-loop-catcher.firebaseapp.com",
-    projectId: "life-after-loop-catcher",
-    storageBucket: "life-after-loop-catcher.appspot.com",
-    messagingSenderId: "664318439902",
-    appId: "1:664318439902:web:93748f55f1cb547bbead4f"
-  };
+    .back-home {
+      margin-bottom: 20px;
+    }
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    .back-home a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
 
-  // Parse URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const ideaId = urlParams.get('id');
-  const ideaTitle = urlParams.get('title');
+    .back-home a:hover {
+      color: var(--accent);
+    }
 
-  if (ideaTitle) {
-    document.getElementById('ideaTitle').textContent =
-      `Creating: ${decodeURIComponent(ideaTitle)}`;
-  }
+    .create-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
 
-  // Expose globals for app.js
-  window.db = db;
-  window.auth = auth;
-  window.ideaId = ideaId;
-  window.ideaTitle = ideaTitle;
+    .create-header h1 {
+      font-size: 32px;
+      margin: 0 0 12px 0;
+    }
 
-  // Let app.js know which page we're on
-  window.currentPage = 'capture';
-</script>
+    .create-header p {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
 
-<!-- Make sure app.js is loaded AFTER the module above -->
-<script src="app.js"></script>
+    .review-output-section {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 24px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .review-output-btn {
+      padding: 16px 32px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .review-output-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+    }
+
+    .tools-section {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+
+    .tools-section h2 {
+      font-size: 24px;
+      margin: 0 0 8px 0;
+      color: var(--accent);
+    }
+
+    .tools-section .subtitle {
+      color: var(--text-muted);
+      margin: 0 0 24px 0;
+      font-size: 14px;
+    }
+
+    .tools-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .search-box {
+      flex: 1;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .view-all-btn {
+      padding: 12px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .view-all-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tool-category {
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tool-category:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .tool-category.hidden {
+      display: none;
+    }
+
+    .tool-category h3 {
+      font-size: 18px;
+      margin: 0 0 16px 0;
+      color: var(--text);
+    }
+
+    .tool-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .tool-item:hover {
+      background: rgba(125, 211, 252, 0.05);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .tool-emoji {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .tool-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tool-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .tool-url {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .no-suggestions {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    /* File Location Modal */
+    .file-location-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .file-location-modal.hidden {
+      display: none;
+    }
+
+    .file-location-content {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .file-location-content h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--text);
+    }
+
+    .file-location-content p {
+      color: var(--text-muted);
+      margin: 0 0 24px 0;
+    }
+
+    .location-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .location-option {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .location-option:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .location-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .location-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .location-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .location-url {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .close-modal-btn {
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .close-modal-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="create-container">
+    <div class="back-home">
+      <a href="app.html">← Back to Home</a>
+    </div>
+
+    <div class="create-header">
+      <h1>🎨 Create</h1>
+      <p id="ideaTitle">Work on your idea</p>
+    </div>
+
+    <div class="review-output-section">
+      <h3 style="margin: 0 0 16px 0; color: var(--text);">Where is your output saved?</h3>
+      <button class="review-output-btn" id="reviewOutputBtn">📂 Choose File Location</button>
+      <p style="margin: 16px 0 0 0; font-size: 12px; color: var(--text-muted);">
+        Click to open your file location and review your work
+      </p>
+    </div>
+
+    <div class="tools-section" id="toolsSection">
+      <h2>🛠️ Suggested Tools</h2>
+      <p class="subtitle" id="toolsSubtitle">Based on your prep answers, here are some tools that might help:</p>
+      
+      <div class="tools-controls">
+        <input type="text" class="search-box" id="toolSearch" placeholder="Search for a tool..." />
+        <button class="view-all-btn" id="viewAllBtn">View All Tools</button>
+      </div>
+      
+      <div id="toolsList"></div>
+      
+      <div class="no-suggestions hidden" id="noSuggestions">
+        <p>No specific tool suggestions available. Complete the prep stage to get personalized recommendations!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- File Location Modal -->
+  <div id="fileLocationModal" class="file-location-modal hidden">
+    <div class="file-location-content">
+      <h2>📂 Open Your File Location</h2>
+      <p>Choose where your output is saved:</p>
+      
+      <div class="location-options">
+        <div class="location-option" data-type="local">
+          <span class="location-icon">💻</span>
+          <div class="location-text">
+            <span class="location-name">Local (Computer)</span>
+            <span class="location-url">Files on your device</span>
+          </div>
+        </div>
+        
+        <a href="https://drive.google.com" target="_blank" class="location-option" data-type="gdrive">
+          <span class="location-icon">📁</span>
+          <div class="location-text">
+            <span class="location-name">Google Drive</span>
+            <span class="location-url">drive.google.com</span>
+          </div>
+        </a>
+        
+        <a href="https://onedrive.live.com" target="_blank" class="location-option" data-type="onedrive">
+          <span class="location-icon">☁️</span>
+          <div class="location-text">
+            <span class="location-name">Microsoft OneDrive</span>
+            <span class="location-url">onedrive.live.com</span>
+          </div>
+        </a>
+        
+        <a href="https://www.dropbox.com" target="_blank" class="location-option" data-type="dropbox">
+          <span class="location-icon">📦</span>
+          <div class="location-text">
+            <span class="location-name">Dropbox</span>
+            <span class="location-url">dropbox.com</span>
+          </div>
+        </a>
+        
+        <a href="https://www.box.com" target="_blank" class="location-option" data-type="box">
+          <span class="location-icon">📮</span>
+          <div class="location-text">
+            <span class="location-name">Box</span>
+            <span class="location-url">box.com</span>
+          </div>
+        </a>
+        
+        <a href="https://www.amazon.com/photos" target="_blank" class="location-option" data-type="amazon">
+          <span class="location-icon">📸</span>
+          <div class="location-text">
+            <span class="location-name">Amazon Drive (Amazon Photos)</span>
+            <span class="location-url">amazon.com/photos</span>
+          </div>
+        </a>
+        
+        <a href="https://mega.io" target="_blank" class="location-option" data-type="mega">
+          <span class="location-icon">🔐</span>
+          <div class="location-text">
+            <span class="location-name">Mega</span>
+            <span class="location-url">mega.io</span>
+          </div>
+        </a>
+        
+        <a href="https://www.pcloud.com" target="_blank" class="location-option" data-type="pcloud">
+          <span class="location-icon">☁️</span>
+          <div class="location-text">
+            <span class="location-name">pCloud</span>
+            <span class="location-url">pcloud.com</span>
+          </div>
+        </a>
+        
+        <a href="https://www.sync.com" target="_blank" class="location-option" data-type="sync">
+          <span class="location-icon">🔄</span>
+          <div class="location-text">
+            <span class="location-name">Sync.com</span>
+            <span class="location-url">sync.com</span>
+          </div>
+        </a>
+        
+        <a href="https://tresorit.com" target="_blank" class="location-option" data-type="tresorit">
+          <span class="location-icon">🔒</span>
+          <div class="location-text">
+            <span class="location-name">Tresorit</span>
+            <span class="location-url">tresorit.com</span>
+          </div>
+        </a>
+        
+        <a href="https://icedrive.net" target="_blank" class="location-option" data-type="icedrive">
+          <span class="location-icon">❄️</span>
+          <div class="location-text">
+            <span class="location-name">Icedrive</span>
+            <span class="location-url">icedrive.net</span>
+          </div>
+        </a>
+      </div>
+      
+      <button class="close-modal-btn" id="closeModalBtn">Cancel</button>
+    </div>
+  </div>
+
+  <script type="module" src="capture.js"></script>
+</body>
+</html>
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQNThNeCaMD7Z8O8mhCGsYyXbg2X8bpms",
+      authDomain: "life-after-loop-catcher.firebaseapp.com",
+      projectId: "life-after-loop-catcher",
+      storageBucket: "life-after-loop-catcher.appspot.com",
+      messagingSenderId: "664318439902",
+      appId: "1:664318439902:web:93748f55f1cb547bbead4f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const ideaId = urlParams.get('id');
+    const ideaTitle = urlParams.get('title');
+    
+    if (ideaTitle) {
+      document.getElementById('ideaTitle').textContent = `Creating: ${decodeURIComponent(ideaTitle)}`;
+    }
+
+    let userSettings = null;
+    let currentUser = null;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadUserSettings();
+        loadAndSuggestTools();
+      }
+    });
+
+    async function loadUserSettings() {
+      if (!currentUser) return;
+
+      try {
+        const settingsDoc = await getDoc(doc(db, 'userSettings', currentUser.uid));
+        if (settingsDoc.exists()) {
+          userSettings = settingsDoc.data();
+          console.log('✅ User settings loaded', userSettings);
+        }
+      } catch (err) {
+        console.error('Error loading user settings:', err);
+      }
+    }
+
+    // All tool categories with keywords
+    const toolCategories = {
+      writing: {
+        keywords: ['write', 'draft', 'compose', 'outline', 'summarize', 'clarify', 'edit', 'document', 'note', 'list', 'jot', 'quick draft', 'practice writing'],
+        emoji: '✍️',
+        title: 'Text Editors & Documentation',
+        tools: [
+          { name: 'Google Docs', url: 'docs.google.com', emoji: '📄' },
+          { name: 'Microsoft Word Online', url: 'office.com/word', emoji: '📝' },
+          { name: 'Notion', url: 'notion.so', emoji: '📓' },
+          { name: 'Evernote', url: 'evernote.com', emoji: '🗒️' },
+          { name: 'Obsidian', url: 'obsidian.md', emoji: '💎' },
+          { name: 'Process Street', url: 'process.st', emoji: '📋' },
+          { name: 'SweetProcess', url: 'sweetprocess.com', emoji: '🍬' },
+          { name: 'Confluence', url: 'atlassian.com/software/confluence', emoji: '🌊' }
+        ]
+      },
+      design: {
+        keywords: ['design', 'illustrate', 'sketch', 'render', 'mockup', 'storyboard', 'doodle', 'quick sketch', 'sample image', 'prototype'],
+        emoji: '🎨',
+        title: 'Design & Visual Tools',
+        tools: [
+          { name: 'Canva', url: 'canva.com', emoji: '🎨' },
+          { name: 'Adobe Photoshop', url: 'adobe.com/photoshop', emoji: '🖼️' },
+          { name: 'Figma', url: 'figma.com', emoji: '🔷' },
+          { name: 'Miro', url: 'miro.com', emoji: '🗺️' },
+          { name: 'Whimsical', url: 'whimsical.com', emoji: '✨' }
+        ]
+      },
+      data: {
+        keywords: ['analyze', 'calculate', 'chart', 'graph', 'compare', 'measure', 'assess', 'check numbers', 'quick review', 'sample calc', 'test data'],
+        emoji: '📊',
+        title: 'Data & Analytics',
+        tools: [
+          { name: 'Microsoft Excel', url: 'office.com/excel', emoji: '📗' },
+          { name: 'Google Sheets', url: 'sheets.google.com', emoji: '📊' },
+          { name: 'Tableau', url: 'tableau.com', emoji: '📈' },
+          { name: 'Power BI', url: 'powerbi.microsoft.com', emoji: '📉' },
+          { name: 'Looker Studio', url: 'lookerstudio.google.com', emoji: '📋' }
+        ]
+      },
+      research: {
+        keywords: ['research', 'discover', 'explore', 'investigate', 'validate', 'gather', 'quick search', 'look up', 'skim', 'check one source'],
+        emoji: '🔍',
+        title: 'Research & Discovery',
+        tools: [
+          { name: 'Google Search', url: 'google.com', emoji: '🔍' },
+          { name: 'Bing with Copilot', url: 'bing.com', emoji: '🤖' },
+          { name: 'Google Scholar', url: 'scholar.google.com', emoji: '🎓' },
+          { name: 'Perplexity AI', url: 'perplexity.ai', emoji: '🧠' },
+          { name: 'Semantic Scholar', url: 'semanticscholar.org', emoji: '📚' }
+        ]
+      },
+      shopping: {
+        keywords: ['buy', 'shop', 'compare', 'review', 'recommend', 'suggest', 'evaluate', 'check one item', 'quick browse', 'sample product'],
+        emoji: '🛒',
+        title: 'Shopping & E-commerce',
+        tools: [
+          { name: 'Amazon', url: 'amazon.com', emoji: '📦' },
+          { name: 'Shopee', url: 'shopee.ph', emoji: '🛍️' },
+          { name: 'Lazada', url: 'lazada.com.ph', emoji: '🏪' },
+          { name: 'Google Shopping', url: 'shopping.google.com', emoji: '🔍' }
+        ]
+      },
+      location: {
+        keywords: ['locate', 'map', 'directions', 'explore', 'recommend', 'discover', 'check nearby', 'quick lookup', 'one location', 'sample route'],
+        emoji: '🗺️',
+        title: 'Maps & Travel',
+        tools: [
+          { name: 'Google Maps', url: 'maps.google.com', emoji: '🗺️' },
+          { name: 'Waze', url: 'waze.com', emoji: '🚗' },
+          { name: 'TripAdvisor', url: 'tripadvisor.com', emoji: '✈️' },
+          { name: 'Booking.com', url: 'booking.com', emoji: '🏨' }
+        ]
+      },
+      video: {
+        keywords: ['watch', 'learn', 'demonstrate', 'record', 'stream', 'tutorial', 'walkthrough', 'quick clip', 'sample video', 'test recording', 'short demo'],
+        emoji: '🎥',
+        title: 'Video & Streaming',
+        tools: [
+          { name: 'YouTube', url: 'youtube.com', emoji: '📺' },
+          { name: 'Loom', url: 'loom.com', emoji: '🎬' },
+          { name: 'Vimeo', url: 'vimeo.com', emoji: '🎞️' },
+          { name: 'OBS Studio', url: 'obsproject.com', emoji: '📹' }
+        ]
+      },
+      communication: {
+        keywords: ['share', 'notify', 'message', 'update', 'collaborate', 'connect', 'mentor', 'send one email', 'post once', 'quick reply', 'test message'],
+        emoji: '💬',
+        title: 'Communication & Collaboration',
+        tools: [
+          { name: 'Gmail', url: 'gmail.com', emoji: '📧' },
+          { name: 'Slack', url: 'slack.com', emoji: '💬' },
+          { name: 'Microsoft Teams', url: 'teams.microsoft.com', emoji: '👥' },
+          { name: 'Discord', url: 'discord.com', emoji: '🎮' }
+        ]
+      },
+      management: {
+        keywords: ['manage', 'schedule', 'invoice', 'track', 'organize', 'plan', 'optimize', 'check one invoice', 'log one expense', 'sample schedule'],
+        emoji: '📋',
+        title: 'Project & Business Management',
+        tools: [
+          { name: 'Trello', url: 'trello.com', emoji: '📋' },
+          { name: 'Asana', url: 'asana.com', emoji: '✅' },
+          { name: 'ClickUp', url: 'clickup.com', emoji: '🎯' },
+          { name: 'Monday.com', url: 'monday.com', emoji: '📅' },
+          { name: 'Notion', url: 'notion.so', emoji: '📓' }
+        ]
+      },
+      brainstorm: {
+        keywords: ['brainstorm', 'imagine', 'innovate', 'prototype', 'experiment', 'try', 'test', 'start', 'pilot', 'smallest version', 'quick attempt'],
+        emoji: '💡',
+        title: 'Brainstorming & Prototyping',
+        tools: [
+          { name: 'Miro', url: 'miro.com', emoji: '🗺️' },
+          { name: 'Whimsical', url: 'whimsical.com', emoji: '✨' },
+          { name: 'Figma', url: 'figma.com', emoji: '🔷' },
+          { name: 'Notion', url: 'notion.so', emoji: '📓' },
+          { name: 'Obsidian', url: 'obsidian.md', emoji: '💎' }
+        ]
+      }
+    };
+
+    let showingAllTools = false;
+    let matchedCategories = [];
+    let skippedPrep = false;
+
+    async function loadAndSuggestTools() {
+      if (!ideaId || !db) {
+        document.getElementById('noSuggestions').classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const ideaDoc = await getDoc(doc(db, 'items', ideaId));
+        
+        if (!ideaDoc.exists()) {
+          document.getElementById('noSuggestions').classList.remove('hidden');
+          return;
+        }
+
+        const ideaData = ideaDoc.data();
+        
+        // ✅ FIXED: Check if prep was skipped
+        if (ideaData.prepSkipped === true) {
+          skippedPrep = true;
+          console.log('📋 Prep was skipped - showing all tools');
+          document.getElementById('toolsSubtitle').textContent = 
+            'You skipped prep, so here are all available tools to help you create';
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // Show all tools
+          return;
+        }
+
+        const minVersion = ideaData.firstTest?.minVersion?.toLowerCase() || '';
+
+        // ✅ If Minimum Version is empty → show all tools
+        if (!minVersion || minVersion.trim() === "") {
+          console.log('📋 No minimum version - showing all tools');
+          document.getElementById('toolsSubtitle').textContent = 
+            'Browse all available tools to help you create';
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // Show all tools
+          return;
+        }
+
+        // Detect matching categories based on keywords
+        for (const [key, category] of Object.entries(toolCategories)) {
+          const hasMatch = category.keywords.some(keyword => 
+            minVersion.includes(keyword.toLowerCase())
+          );
+          if (hasMatch) {
+            matchedCategories.push(category);
+          }
+        }
+
+        // ✅ If no categories matched → show all tools
+        if (matchedCategories.length === 0) {
+          console.log('📋 No keyword matches - showing all tools');
+          document.getElementById('toolsSubtitle').textContent = 
+            'Browse all available tools to help you create';
+          document.getElementById('noSuggestions').classList.add('hidden');
+          renderTools([]); // Show all tools
+          return;
+        }
+
+        // Show matched categories
+        console.log(`📋 Found ${matchedCategories.length} matching categories`);
+        document.getElementById('noSuggestions').classList.add('hidden');
+        renderTools(matchedCategories);
+
+      } catch (err) {
+        console.error('Error loading idea data:', err);
+        document.getElementById('noSuggestions').classList.remove('hidden');
+      }
+    }
+
+    function renderTools(categories) {
+      const toolsList = document.getElementById('toolsList');
+      toolsList.innerHTML = '';
+
+      // ✅ If categories is empty → show ALL tools
+      const categoriesToShow = categories.length === 0 
+        ? Object.values(toolCategories) 
+        : categories;
+
+      // First, render preferred tools if user has them
+      if (userSettings?.preferredTools && userSettings.preferredTools.length > 0) {
+        const preferredCategory = document.createElement('div');
+        preferredCategory.className = 'tool-category';
+        preferredCategory.dataset.category = 'preferred';
+        
+        preferredCategory.innerHTML = `
+          <h3>⭐ My Preferred Tools</h3>
+          <div class="tool-list">
+            ${userSettings.preferredTools.map(tool => {
+              if (!tool.name || !tool.url) return '';
+              const cleanUrl = tool.url.replace(/^https?:\/\//, '');
+              return `
+                <a href="${tool.url.startsWith('http') ? tool.url : 'https://' + tool.url}" target="_blank" class="tool-item" data-tool-name="${tool.name.toLowerCase()}">
+                  <span class="tool-emoji">⭐</span>
+                  <div class="tool-text">
+                    <span class="tool-name">${tool.name}</span>
+                    <span class="tool-url">${cleanUrl}</span>
+                  </div>
+                </a>
+              `;
+            }).join('')}
+          </div>
+        `;
+        
+        toolsList.appendChild(preferredCategory);
+      }
+
+      // Then render suggested/all categories
+      categoriesToShow.forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'tool-category';
+        categoryDiv.dataset.category = category.title.toLowerCase();
+        
+        categoryDiv.innerHTML = `
+          <h3>${category.emoji} ${category.title}</h3>
+          <div class="tool-list">
+            ${category.tools.map(tool => `
+              <a href="https://${tool.url}" target="_blank" class="tool-item" data-tool-name="${tool.name.toLowerCase()}">
+                <span class="tool-emoji">${tool.emoji}</span>
+                <div class="tool-text">
+                  <span class="tool-name">${tool.name}</span>
+                  <span class="tool-url">${tool.url}</span>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        `;
+        
+        toolsList.appendChild(categoryDiv);
+      });
+    }
+
+    // View All Tools button
+    document.getElementById('viewAllBtn').addEventListener('click', () => {
+      showingAllTools = !showingAllTools;
+      const btn = document.getElementById('viewAllBtn');
+      
+      if (showingAllTools) {
+        btn.textContent = 'View Suggested Only';
+        renderTools([]); // empty array = show ALL tools
+      } else {
+        btn.textContent = 'View All Tools';
+        renderTools(matchedCategories.length > 0 ? matchedCategories : []);
+      }
+    });
+
+    // Search functionality
+    document.getElementById('toolSearch').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      document.querySelectorAll('.tool-category').forEach(category => {
+        const tools = category.querySelectorAll('.tool-item');
+        let hasVisibleTool = false;
+        
+        tools.forEach(tool => {
+          const toolName = tool.dataset.toolName;
+          if (toolName.includes(searchTerm)) {
+            tool.style.display = 'flex';
+            hasVisibleTool = true;
+          } else {
+            tool.style.display = 'none';
+          }
+        });
+        
+        category.classList.toggle('hidden', !hasVisibleTool);
+      });
+    });
+
+    // File Location Modal
+    const fileLocationModal = document.getElementById('fileLocationModal');
+    const reviewOutputBtn = document.getElementById('reviewOutputBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    reviewOutputBtn.addEventListener('click', () => {
+      // If user has default storage, go directly there
+      if (userSettings?.defaultStorage && userSettings.defaultStorage !== '') {
+        handleStorageSelection(userSettings.defaultStorage);
+      } else {
+        // Otherwise show modal
+        fileLocationModal.classList.remove('hidden');
+      }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      fileLocationModal.classList.add('hidden');
+    });
+
+    // Storage URL map
+    const storageUrls = {
+      'gdrive': 'https://drive.google.com',
+      'onedrive': 'https://onedrive.live.com',
+      'dropbox': 'https://www.dropbox.com',
+      'box': 'https://www.box.com',
+      'amazon': 'https://www.amazon.com/photos',
+      'mega': 'https://mega.io',
+      'pcloud': 'https://www.pcloud.com',
+      'sync': 'https://www.sync.com',
+      'tresorit': 'https://tresorit.com',
+      'icedrive': 'https://icedrive.net'
+    };
+
+    async function handleStorageSelection(type) {
+      // Mark stages as complete silently
+      if (ideaId && db) {
+        try {
+          await updateDoc(doc(db, 'items', ideaId), {
+            createCompleted: true,
+            createCompletedAt: serverTimestamp(),
+            reviewCompleted: true,
+            reviewCompletedAt: serverTimestamp(),
+            fileLocation: type
+          });
+          console.log('✅ Progress updated');
+        } catch (err) {
+          console.error('Error updating progress:', err);
+        }
+      }
+
+      // Close modal
+      fileLocationModal.classList.add('hidden');
+
+      // Handle local or open URL
+      if (type === 'local') {
+        setTimeout(() => {
+          alert('💡 Tip: Open your file explorer to access your local files');
+        }, 300);
+      } else if (storageUrls[type]) {
+        window.open(storageUrls[type], '_blank');
+      }
+    }
+
+    // Handle location option clicks
+    document.querySelectorAll('.location-option').forEach(option => {
+      option.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const type = option.dataset.type;
+        handleStorageSelection(type);
+      });
+    });
+
+    // Load tools on page load
+    loadAndSuggestTools();
+  </script>
+</body>
+</html>
