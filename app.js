@@ -176,6 +176,112 @@ function escapeHtml(str) {
   return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
 }
 
+// Storage URLs
+const storageUrls = {
+  'local': null,
+  'gdrive': 'https://drive.google.com',
+  'onedrive': 'https://onedrive.live.com',
+  'dropbox': 'https://www.dropbox.com',
+  'box': 'https://www.box.com',
+  'amazon': 'https://www.amazon.com/photos',
+  'mega': 'https://mega.io',
+  'pcloud': 'https://www.pcloud.com',
+  'sync': 'https://www.sync.com',
+  'tresorit': 'https://tresorit.com',
+  'icedrive': 'https://icedrive.net'
+};
+
+// Open storage modal
+function openStorageModal(ideaId, buttonType) {
+  const modal = document.createElement('div');
+  modal.className = 'storage-modal';
+  modal.dataset.ideaId = ideaId;
+  modal.dataset.buttonType = buttonType;
+  
+  modal.innerHTML = `
+    <div class="storage-modal-content">
+      <h2>📂 Choose Storage Location</h2>
+      <p style="color: var(--text-muted); margin-bottom: 24px;">Where is your output saved?</p>
+      
+      <div class="storage-options">
+        <div class="storage-option" data-type="local">
+          <span class="storage-icon">💻</span>
+          <span class="storage-name">Local (Computer)</span>
+        </div>
+        <div class="storage-option" data-type="gdrive">
+          <span class="storage-icon">📁</span>
+          <span class="storage-name">Google Drive</span>
+        </div>
+        <div class="storage-option" data-type="onedrive">
+          <span class="storage-icon">☁️</span>
+          <span class="storage-name">OneDrive</span>
+        </div>
+        <div class="storage-option" data-type="dropbox">
+          <span class="storage-icon">📦</span>
+          <span class="storage-name">Dropbox</span>
+        </div>
+      </div>
+      
+      <button class="btn btn-secondary close-storage-modal" style="margin-top: 16px; width: 100%;">Cancel</button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Handle storage option clicks
+  modal.querySelectorAll('.storage-option').forEach(option => {
+    option.addEventListener('click', async () => {
+      const type = option.dataset.type;
+      await handleStorageSelection(ideaId, type, buttonType);
+      modal.remove();
+    });
+  });
+  
+  // Handle cancel
+  modal.querySelector('.close-storage-modal').addEventListener('click', () => {
+    modal.remove();
+  });
+}
+
+// Handle storage selection
+async function handleStorageSelection(ideaId, storageType, buttonType) {
+  if (!db || !ideaId) return;
+  
+  try {
+    const updateData = {};
+    
+    // Mark create as completed for both resume and review
+    updateData.createCompleted = true;
+    updateData.createCompletedAt = serverTimestamp();
+    updateData.fileLocation = storageType;
+    
+    // Only mark review as completed if review button was clicked
+    if (buttonType === 'review') {
+      updateData.reviewCompleted = true;
+      updateData.reviewCompletedAt = serverTimestamp();
+    }
+    
+    await updateDoc(doc(db, 'items', ideaId), updateData);
+    console.log('✅ Progress updated');
+    
+    // Open storage location
+    if (storageType === 'local') {
+      alert('💡 Tip: Open your file explorer to access your local files');
+    } else if (storageUrls[storageType]) {
+      window.open(storageUrls[storageType], '_blank');
+    }
+    
+  } catch (err) {
+    console.error('Error updating progress:', err);
+    alert('Error saving progress');
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
+}
+
 function clearRow(row) {
   row.querySelector('.term-input').value = '';
   row.querySelector('.output-select').value = '';
@@ -595,6 +701,20 @@ function renderView(view = currentView, items = []) {
             <span class="stage ${it.reviewCompleted ? 'completed' : ''}" title="Review">📂</span>
             <span class="stage ${it.launchCompleted ? 'completed' : ''}" title="Launch">🚀</span>
           </div>
+          
+          ${it.prepCompleted || it.prepSkipped ? `
+          <div class="action-buttons-container" style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="action-btn-small resume-creation-btn" data-id="${it.id}" data-completed="${it.createCompleted ? 'true' : 'false'}" ${it.createCompleted ? 'disabled' : ''}>
+              🎨 Resume Creation
+            </button>
+            <button class="action-btn-small review-btn" data-id="${it.id}" data-completed="${it.reviewCompleted ? 'true' : 'false'}" ${it.reviewCompleted ? 'disabled' : ''}>
+              📂 Review
+            </button>
+            <button class="action-btn-small tests-btn" data-id="${it.id}" data-term="${escapeHtml(it.term)}">
+              🧪 Tests
+            </button>
+          </div>
+          ` : ''}
         </div>
       </div>
       <div class="actions">
@@ -642,6 +762,71 @@ function renderView(view = currentView, items = []) {
     const launchBtn = card.querySelector('.launch-btn');
     if (launchBtn) {
       launchBtn.onclick = () => openLaunchModal(it.id, it.term);
+    }
+
+    // Resume Creation button
+    const resumeBtn = card.querySelector('.resume-creation-btn');
+    if (resumeBtn) {
+      resumeBtn.onclick = async (e) => {
+        e.stopPropagation();
+        if (resumeBtn.dataset.completed === 'true') return;
+        
+        // Load user settings to check for default storage
+        let userSettings = null;
+        if (auth && auth.currentUser) {
+          try {
+            const settingsDoc = await getDoc(doc(db, 'userSettings', auth.currentUser.uid));
+            if (settingsDoc.exists()) {
+              userSettings = settingsDoc.data();
+            }
+          } catch (err) {
+            console.error('Error loading settings:', err);
+          }
+        }
+        
+        if (userSettings?.defaultStorage) {
+          await handleStorageSelection(it.id, userSettings.defaultStorage, 'resume');
+        } else {
+          openStorageModal(it.id, 'resume');
+        }
+      };
+    }
+    
+    // Review button
+    const reviewBtn = card.querySelector('.review-btn');
+    if (reviewBtn) {
+      reviewBtn.onclick = async (e) => {
+        e.stopPropagation();
+        if (reviewBtn.dataset.completed === 'true') return;
+        
+        // Load user settings to check for default storage
+        let userSettings = null;
+        if (auth && auth.currentUser) {
+          try {
+            const settingsDoc = await getDoc(doc(db, 'userSettings', auth.currentUser.uid));
+            if (settingsDoc.exists()) {
+              userSettings = settingsDoc.data();
+            }
+          } catch (err) {
+            console.error('Error loading settings:', err);
+          }
+        }
+        
+        if (userSettings?.defaultStorage) {
+          await handleStorageSelection(it.id, userSettings.defaultStorage, 'review');
+        } else {
+          openStorageModal(it.id, 'review');
+        }
+      };
+    }
+    
+    // Tests button
+    const testsBtn = card.querySelector('.tests-btn');
+    if (testsBtn) {
+      testsBtn.onclick = (e) => {
+        e.stopPropagation();
+        window.location.href = `test.html?id=${it.id}&title=${encodeURIComponent(it.term)}`;
+      };
     }
 
     card.querySelector('.edit').onclick = () => openModal(it);
