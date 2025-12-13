@@ -293,6 +293,23 @@ main {
   color: var(--bg);
 }
 
+.clear-row-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 500;
+  padding: 6px 12px;
+  white-space: nowrap;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-row-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
 .card {
   background: var(--bg-elevated);
   padding: 14px 16px;
@@ -537,7 +554,6 @@ button.small.delete:hover {
   color: var(--text-muted);
   font-size: 12px;
 }
-/* Add these to your styles.css file */
 
 /* Light mode */
 body.light-mode,
@@ -610,4 +626,102 @@ html.layout-spacious main {
 
 html.layout-spacious header {
   padding: 20px 28px !important;
+}
+
+/* ====== NEW: ACTION BUTTONS IN CARDS ====== */
+.action-buttons-container {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.action-btn-small {
+  padding: 6px 12px;
+  font-size: 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.action-btn-small:hover:not([disabled]) {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.action-btn-small[disabled],
+.action-btn-small[data-completed="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+/* ====== NEW: STORAGE MODAL ====== */
+.storage-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.storage-modal-content {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.storage-modal-content h2 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.storage-options {
+  display: grid;
+  gap: 8px;
+}
+
+.storage-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.storage-option:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.storage-icon {
+  font-size: 20px;
+}
+
+.storage-name {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
 }
