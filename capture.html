@@ -46,7 +46,7 @@
       font-size: 16px;
     }
 
-    .review-output-section {
+    .progress-actions-section {
       text-align: center;
       margin-bottom: 40px;
       padding: 24px;
@@ -55,21 +55,54 @@
       border-radius: var(--radius);
     }
 
-    .review-output-btn {
-      padding: 16px 32px;
-      background: var(--accent);
-      color: var(--bg);
-      border: none;
-      border-radius: var(--radius);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
+    .action-buttons-container {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .review-output-btn:hover {
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 20px 32px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 140px;
+    }
+
+    .action-btn:hover:not([data-completed="true"]) {
+      background: var(--accent-glow);
+      border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(125, 211, 252, 0.3);
+    }
+
+    .action-btn[data-completed="true"] {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: #22c55e;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .action-btn[disabled] {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .action-icon {
+      font-size: 32px;
+    }
+
+    .action-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
     }
 
     .tools-section {
